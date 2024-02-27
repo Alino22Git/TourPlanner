@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:TourPlanner"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style x:Key="MyStyle" TargetType="{x:Type Window}">
+            <Setter Property="Background" Value="#FF312929" />
+        </Style>
     </Application.Resources>
 </Application>
