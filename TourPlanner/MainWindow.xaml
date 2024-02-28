@@ -59,7 +59,6 @@
         <Border Grid.Row="2"  Grid.ColumnSpan="4"  BorderBrush="Gainsboro" BorderThickness="1" Margin="0,0,133,0" Grid.RowSpan="3">
             <Menu Grid.Row="2" Grid.ColumnSpan="2"   Grid.RowSpan="1" Background="#FF312929" Foreground="White">
                 <MenuItem Header="Tours">
-                    <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding TourData}"/>
                 </MenuItem>
             </Menu>
         </Border>
@@ -75,7 +74,6 @@
         <Border Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="4" BorderBrush="Gainsboro" BorderThickness="1" Margin="0,60,0,0" Grid.RowSpan="1" >
             <Menu Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Background="#FF312929" Foreground="White">
                 <MenuItem Header="Tour Logs">
-                    <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding TourLogData}"/>
                 </MenuItem>
             </Menu>
         </Border>
