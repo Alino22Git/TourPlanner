@@ -61,3 +61,5 @@ C:\Users\micha\Source\Repos\TourPlanner\TourPlanner\obj\Debug\net7.0-windows\Tou
 C:\Users\micha\Source\Repos\TourPlanner\TourPlanner\obj\Debug\net7.0-windows\ref\TourPlanner.dll
 C:\Users\micha\source\repos\TourPlanner\TourPlanner\obj\Debug\net7.0-windows\App.baml
 C:\Users\hajra\OneDrive\FH-Technikum\4.Semester\SWEN2\TourPlanner\TourPlanner\obj\Debug\net7.0-windows\App.baml
+C:\Users\hajra\OneDrive\FH-Technikum\4.Semester\SWEN2\TourPlanner\TourPlanner\obj\Debug\net7.0-windows\AddTourWindow.g.cs
+C:\Users\hajra\OneDrive\FH-Technikum\4.Semester\SWEN2\TourPlanner\TourPlanner\obj\Debug\net7.0-windows\AddTourWindow.baml
