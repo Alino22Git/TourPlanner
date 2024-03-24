@@ -57,13 +57,28 @@
         </StackPanel>
 
 
-        <Border Grid.Row="2"  Grid.ColumnSpan="4"  BorderBrush="Gainsboro" BorderThickness="1" Margin="0,0,133,0" Grid.RowSpan="3">
-            <Menu Grid.Row="2" Grid.ColumnSpan="2"   Grid.RowSpan="1" Background="#FF312929" Foreground="White">
-                <MenuItem Header="Tours">
-                </MenuItem>
-                <Grid/>
-            </Menu>
+        <Border Grid.Row="2" Grid.ColumnSpan="4" BorderBrush="Gainsboro" BorderThickness="1" Margin="0,0,133,0" Grid.RowSpan="3">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
+                    <MenuItem Header="Tours" Click="AddTourMenuItem_Click"/>
+                </Menu>
+
+                <ListBox Grid.Row="1" ItemsSource="{Binding Tours}" Background="#FF312929" Foreground="White">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" Background="#FF312929" Foreground="White"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
         </Border>
+
+
 
         <Border Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="4" Grid.RowSpan="3" BorderBrush="Gainsboro" BorderThickness="1">
             <Menu  Background="#FF312929" Foreground="White">

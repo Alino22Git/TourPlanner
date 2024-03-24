@@ -17,22 +17,36 @@ namespace TourPlanner
 {
     public partial class AddTourWindow : Window
     {
-        public AddTourWindow()
+        private readonly TourViewModel viewModel;
+
+        public AddTourWindow(TourViewModel viewModel)
         {
             InitializeComponent();
-        }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
+            this.viewModel = viewModel;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = NameTextBox.Text;
-            string location = LocationTextBox.Text;
-            string distance = DistanceTextBox.Text;
-            string description = DescriptionTextBox.Text;
+            // Erstellen Sie eine neue Tour basierend auf den Eingaben im Fenster
+            Tour newTour = new Tour
+            {
+                Name = NameTextBox.Text,
+                Location = LocationTextBox.Text,
+                Distance = DistanceTextBox.Text,
+                Description = DescriptionTextBox.Text
+            };
+
+            // Fügen Sie die neue Tour zum ViewModel hinzu
+            viewModel.AddTour(newTour);
+
+            // Fenster schließen
+            Close();
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Fenster schließen
+            Close();
         }
     }
 }
