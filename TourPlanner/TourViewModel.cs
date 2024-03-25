@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace TourPlanner
 {
@@ -40,7 +40,8 @@ namespace TourPlanner
                 new Tour { Name = "Tour 3", From = "Location 3", To = "Location 1", Distance = "20 km", Time = "00", Description = "Description 3" }
             };
 
-            TourLogs = new ObservableCollection<TourLog>();
+            // Fügen Sie die Beispiel-Tour-Logs hinzu
+            TourLogs = new ObservableCollection<TourLog>(TourLog.CreateExampleTourLogs());
         }
 
         public void AddTour(Tour newTour)

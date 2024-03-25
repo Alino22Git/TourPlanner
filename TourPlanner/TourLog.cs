@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace TourPlanner
 {
@@ -14,16 +14,22 @@ namespace TourPlanner
         public string? Rating { get; set; }
         public string? Weather { get; set; }
 
-        public ObservableCollection<TourLog> TourLogs { get; set; }
+        // Eine Liste von ausgewählten Touren für das Tour-Log
+        public List<Tour> SelectedTours { get; set; }
 
         // Konstruktor
         public TourLog()
         {
-            // Initialisiere die Liste der Tour-Logs
-            TourLogs = new ObservableCollection<TourLog>();
+            // Initialisiere die Liste der ausgewählten Touren
+            SelectedTours = new List<Tour>();
+        }
 
-            // Füge einige Beispiel-Tour-Logs hinzu (kann optional sein)
-            TourLogs.Add(new TourLog
+        // Methode zum Erstellen von Beispiel-Tour-Logs
+        public static List<TourLog> CreateExampleTourLogs()
+        {
+            var exampleLogs = new List<TourLog>();
+
+            exampleLogs.Add(new TourLog
             {
                 Date = DateTime.Today,
                 Comment = "First tour log",
@@ -33,7 +39,7 @@ namespace TourPlanner
                 Rating = "3 Stars",
                 Weather = "Sunny"
             });
-            TourLogs.Add(new TourLog
+            exampleLogs.Add(new TourLog
             {
                 Date = DateTime.Today.AddDays(-1),
                 Comment = "Second tour log",
@@ -43,7 +49,7 @@ namespace TourPlanner
                 Rating = "4 Stars",
                 Weather = "Cloudy"
             });
-            TourLogs.Add(new TourLog
+            exampleLogs.Add(new TourLog
             {
                 Date = DateTime.Today.AddDays(-2),
                 Comment = "Third tour log",
@@ -53,8 +59,8 @@ namespace TourPlanner
                 Rating = "5 Stars",
                 Weather = "Rainy"
             });
+
+            return exampleLogs;
         }
-
-
     }
 }

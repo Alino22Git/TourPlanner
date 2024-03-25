@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -14,11 +15,12 @@ namespace TourPlanner
             InitializeComponent();
             this.viewModel = viewModel;
 
-            // Populate the ListBox with existing tours
-            foreach (var tour in viewModel.Tours)
-            {
-                ToursListBox.Items.Add(tour.Name);
-            }
+            // Setzen Sie den DataContext auf das ViewModel, damit die ListBox korrekt gebunden wird
+            DataContext = viewModel;
+
+            // Populieren Sie die ListBox mit vorhandenen Touren
+            ToursListBox.ItemsSource = viewModel.Tours;
+            ToursListBox.DisplayMemberPath = "Name";
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -32,7 +34,8 @@ namespace TourPlanner
                 TotalDistance = TotalDistanceSlider.Value,
                 TotalTime = TotalTimeSlider.Value,
                 Rating = selectedDifficulty,
-                Weather = GetSelectedWeather()
+                Weather = GetSelectedWeather(),
+                SelectedTours = GetSelectedTours() // Fügen Sie die ausgewählten Touren hinzu
             };
 
             // Fügen Sie das neue Tour-Log zum ViewModel hinzu
@@ -40,6 +43,18 @@ namespace TourPlanner
 
             // Fenster schließen
             Close();
+        }
+
+        private List<Tour> GetSelectedTours()
+        {
+            List<Tour> selectedTours = new List<Tour>();
+
+            foreach (Tour tour in ToursListBox.SelectedItems)
+            {
+                selectedTours.Add(tour);
+            }
+
+            return selectedTours;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -62,7 +77,6 @@ namespace TourPlanner
             return string.Empty;
         }
 
-
         private void DifficultyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Überprüfen, ob eine Auswahl vorhanden ist
@@ -74,11 +88,6 @@ namespace TourPlanner
                 // Zugriff auf den Inhalt des ausgewählten Elements (z. B. Schwierigkeitsgrad)
                 selectedDifficulty = selectedItem.Content.ToString();
             }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
         }
     }
 }
