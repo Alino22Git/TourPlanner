@@ -21,7 +21,12 @@ namespace TourPlanner
 
         public TourViewModel()
         {
-            Tours = new ObservableCollection<Tour>();
+            Tours = new ObservableCollection<Tour>()
+            {
+            new Tour { Name = "Tour 1", From = "Location 1",To = "Location 1", Distance = "10 km", Time = "00",Description = "Description 1" },
+            new Tour { Name = "Tour 2", From = "Location 2", To = "Location 1", Distance = "15 km", Time = "00", Description = "Description 2" },
+            new Tour { Name = "Tour 3", From = "Location 3", To = "Location 1", Distance = "20 km", Time = "00", Description = "Description 3" }
+        };
         }
 
         public void AddTour(Tour newTour)

@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET7_0;NETCOREAPP
 C:\Users\hajra\OneDrive\FH-Technikum\4.Semester\SWEN2\TourPlanner\TourPlanner\App.xaml
-2-1273892848
+3-1013718954
 
-9-712207379
+101088900873
 198-2048575587
-AddTourWindow.xaml;MainWindow.xaml;
+AddTourLogWindow.xaml;AddTourWindow.xaml;MainWindow.xaml;
 
-True
+False
 

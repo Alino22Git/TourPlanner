@@ -31,8 +31,10 @@ namespace TourPlanner
             Tour newTour = new Tour
             {
                 Name = NameTextBox.Text,
-                Location = LocationTextBox.Text,
+                From = FromTextBox.Text,
+                To = FromTextBox.Text,
                 Distance = DistanceTextBox.Text,
+                Time = TimeTextBox.Text,
                 Description = DescriptionTextBox.Text
             };
 
