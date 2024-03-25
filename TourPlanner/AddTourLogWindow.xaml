@@ -5,10 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TourPlanner"
         mc:Ignorable="d"
-        Title="Tour Log" Height="550" Width="400"
+        Title="Tour Log" Height="620" Width="400"
         DataContext="{Binding RelativeSource={RelativeSource Self}}" Foreground="White" Style="{DynamicResource MyStyle}">
     <StackPanel Margin="10">
-        <Label Content="Date:" Foreground="White"/>
+
+        <Label Content="Tours:" Foreground="White"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="60">
+            <ListBox x:Name="ToursListBox" SelectionMode="Multiple" Margin="0,0,0,5" d:ItemsSource="{d:SampleData ItemCount=5}"/>
+        </ScrollViewer>
+
+<Label Content="Date:" Foreground="White"/>
         <DatePicker x:Name="DateDatePicker" Margin="0,0,0,5"/>
 
         <Label Content="Comment:" Foreground="White"/>
@@ -46,7 +52,7 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Add"  Margin="0,20,5,0" Padding="15,0"/>
-            <Button Content="Cancel"   Margin="0,20,0,0" Padding="10,2"/>
+            <Button Content="Cancel"   Margin="0,20,0,0" Padding="10,2" Click="Button_Click"/>
         </StackPanel>
     </StackPanel>
 </Window>

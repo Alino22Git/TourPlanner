@@ -99,10 +99,14 @@
                     <MenuItem Header="Tour Logs" Click="AddTourLogMenuItem_Click"/>
                 </Menu>
 
-                <ListBox Grid.Row="1" ItemsSource="{Binding Tours}" Background="#FF312929" Foreground="White">
+                <ListBox Grid.Row="1" ItemsSource="{Binding TourLogs}" Background="#FF312929" Foreground="White">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}" Background="#FF312929" Foreground="White"/>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Date}" Background="#FF312929" Foreground="White"/>
+                                <TextBlock Text="{Binding Duration}" Background="#FF312929" Foreground="White"/>
+                                <TextBlock Text="{Binding Distance}" Background="#FF312929" Foreground="White"/>
+                            </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

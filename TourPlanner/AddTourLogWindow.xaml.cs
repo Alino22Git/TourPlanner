@@ -13,6 +13,12 @@ namespace TourPlanner
         {
             InitializeComponent();
             this.viewModel = viewModel;
+
+            // Populate the ListBox with existing tours
+            foreach (var tour in viewModel.Tours)
+            {
+                ToursListBox.Items.Add(tour.Name);
+            }
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -68,6 +74,11 @@ namespace TourPlanner
                 // Zugriff auf den Inhalt des ausgewählten Elements (z. B. Schwierigkeitsgrad)
                 selectedDifficulty = selectedItem.Content.ToString();
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }
