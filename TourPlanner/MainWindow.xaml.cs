@@ -41,5 +41,12 @@ namespace TourPlanner
             AddTourWindow addTourWindow = new AddTourWindow(tourViewModel);
             addTourWindow.ShowDialog();
         }
+
+        private void AddTourLogMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            // Öffnen Sie das AddTourWindow und übergeben Sie das TourViewModel
+            AddTourLogWindow addTourLogWindow = new AddTourLogWindow(tourViewModel);
+            addTourLogWindow.ShowDialog();
+        }
     }
 }

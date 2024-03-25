@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TourPlanner.AddTourWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Add Tour" Height="400" Width="400"
+        Title="Tours" Height="400" Width="400"
         DataContext="{Binding RelativeSource={RelativeSource Self}}" Foreground="White" Style="{DynamicResource MyStyle}">
     <StackPanel Margin="10">
         <Label Content="Name:" Foreground="White"/>

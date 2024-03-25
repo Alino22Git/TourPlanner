@@ -1,27 +1,73 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace TourPlanner
 {
-    /// <summary>
-    /// Interaktionslogik für Window1.xaml
-    /// </summary>
-    public partial class Window1 : Window
+    public partial class AddTourLogWindow : Window
     {
-        public Window1()
+        private readonly TourViewModel viewModel;
+        private string? selectedDifficulty;
+
+        public AddTourLogWindow(TourViewModel viewModel)
         {
             InitializeComponent();
+            this.viewModel = viewModel;
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Erstellen Sie eine neue Tour-Log basierend auf den Eingaben im Fenster
+            TourLog newTourLog = new TourLog
+            {
+                Date = DateDatePicker.SelectedDate,
+                Comment = CommentTextBox.Text,
+                Difficulty = DifficultyComboBox.SelectedItem?.ToString(),
+                TotalDistance = TotalDistanceSlider.Value,
+                TotalTime = TotalTimeSlider.Value,
+                Rating = selectedDifficulty,
+                Weather = GetSelectedWeather()
+            };
+
+            // Fügen Sie das neue Tour-Log zum ViewModel hinzu
+            viewModel.AddTourLog(newTourLog);
+
+            // Fenster schließen
+            Close();
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Fenster schließen
+            Close();
+        }
+
+        private string? GetSelectedWeather()
+        {
+            if (SunnyRadioButton.IsChecked == true)
+                return SunnyRadioButton.Content.ToString();
+            if (CloudyRadioButton.IsChecked == true)
+                return CloudyRadioButton.Content.ToString();
+            if (RainyRadioButton.IsChecked == true)
+                return RainyRadioButton.Content.ToString();
+            if (SnowyRadioButton.IsChecked == true)
+                return SnowyRadioButton.Content.ToString();
+
+            return string.Empty;
+        }
+
+
+        private void DifficultyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Überprüfen, ob eine Auswahl vorhanden ist
+            if (DifficultyComboBox.SelectedItem != null)
+            {
+                // Typkonvertierung des ausgewählten Elements zu einem ComboBoxItem
+                ComboBoxItem selectedItem = (ComboBoxItem)DifficultyComboBox.SelectedItem;
+
+                // Zugriff auf den Inhalt des ausgewählten Elements (z. B. Schwierigkeitsgrad)
+                selectedDifficulty = selectedItem.Content.ToString();
+            }
         }
     }
 }
