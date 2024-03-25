@@ -25,14 +25,18 @@ namespace TourPlanner
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
+            // Runden Sie die Dezimalwerte für TotalTime und TotalDistance auf die nächste ganze Zahl
+            int roundedTotalTime = (int)Math.Round(TotalTimeSlider.Value);
+            int roundedTotalDistance = (int)Math.Round(TotalDistanceSlider.Value);
+
             // Erstellen Sie eine neue Tour-Log basierend auf den Eingaben im Fenster
             TourLog newTourLog = new TourLog
             {
                 Date = DateDatePicker.SelectedDate,
                 Comment = CommentTextBox.Text,
                 Difficulty = DifficultyComboBox.SelectedItem?.ToString(),
-                TotalDistance = TotalDistanceSlider.Value,
-                TotalTime = TotalTimeSlider.Value,
+                TotalDistance = roundedTotalDistance,
+                TotalTime = roundedTotalTime,
                 Rating = selectedDifficulty,
                 Weather = GetSelectedWeather(),
                 SelectedTours = GetSelectedTours() // Fügen Sie die ausgewählten Touren hinzu
