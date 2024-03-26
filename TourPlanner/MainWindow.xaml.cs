@@ -48,5 +48,33 @@ namespace TourPlanner
             AddTourLogWindow addTourLogWindow = new AddTourLogWindow(tourViewModel);
             addTourLogWindow.ShowDialog();
         }
+
+        private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // Überprüfen, ob das Ereignis ausgelöst wird
+            Debug.WriteLine("ListBoxItem double-clicked!");
+
+            // Überprüfen Sie den DataContext-Wert
+            if (sender is ListBox listBox)
+            {
+                // Holen Sie die ID des ausgewählten Elements im ListBox
+                if (listBox.SelectedValue is int tourId)
+                {
+                    // Holen Sie das ausgewählte Tour-Objekt aus dem ViewModel
+                    Tour? selectedTour = tourViewModel.FindTourById(tourId);
+                    if (selectedTour != null)
+                    {
+                        Debug.WriteLine($"Selected Tour: {selectedTour.Name}");
+                        // Öffnen Sie das AddTourWindow mit den Details der ausgewählten Tour
+                        AddTourWindow addTourWindow = new AddTourWindow(tourViewModel, selectedTour);
+                        addTourWindow.ShowDialog();
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Tour with ID {tourId} not found.");
+                    }
+                }
+            }
+        }
     }
 }

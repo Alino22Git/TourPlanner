@@ -15,8 +15,11 @@ namespace TourPlanner
             get { return tours; }
             set
             {
-                tours = value;
-                OnPropertyChanged(nameof(Tours));
+                if (tours != value)
+                {
+                    tours = value;
+                    OnPropertyChanged(nameof(Tours));
+                }
             }
         }
 
@@ -33,13 +36,22 @@ namespace TourPlanner
 
         public TourViewModel()
         {
+            InitializeTours();
+            InitializeTourLogs();
+        }
+
+        public void InitializeTours()
+        {
             Tours = new ObservableCollection<Tour>()
             {
-                new Tour { Name = "Tour 1", From = "Location 1", To = "Location 1", Distance = "10 km", Time = "00", Description = "Description 1" },
-                new Tour { Name = "Tour 2", From = "Location 2", To = "Location 1", Distance = "15 km", Time = "00", Description = "Description 2" },
-                new Tour { Name = "Tour 3", From = "Location 3", To = "Location 1", Distance = "20 km", Time = "00", Description = "Description 3" }
+                new Tour { Id = 1, Name = "Tour 1", From = "Location 1", To = "Location 1", Distance = "10 km", Time = "00", Description = "Description 1" },
+                new Tour { Id = 2, Name = "Tour 2", From = "Location 2", To = "Location 1", Distance = "15 km", Time = "00", Description = "Description 2" },
+                new Tour { Id = 3, Name = "Tour 3", From = "Location 3", To = "Location 1", Distance = "20 km", Time = "00", Description = "Description 3" }
             };
+        }
 
+        private void InitializeTourLogs()
+        {
             // Fügen Sie die Beispiel-Tour-Logs hinzu
             TourLogs = new ObservableCollection<TourLog>(TourLog.CreateExampleTourLogs());
         }
@@ -48,6 +60,7 @@ namespace TourPlanner
         {
             Debug.Assert(Tours != null, nameof(Tours) + " != null");
             Tours.Add(newTour);
+            OnPropertyChanged(nameof(Tours)); // Aktualisieren der Ansicht
         }
 
         public void AddTourLog(TourLog newTourLog)
@@ -56,9 +69,42 @@ namespace TourPlanner
             TourLogs.Add(newTourLog);
         }
 
+        public void UpdateTour(Tour? updatedTour)
+        {
+            Debug.Assert(Tours != null, nameof(Tours) + " != null");
+
+            // Suchen Sie die zu aktualisierende Tour in der Liste
+            Tour? existingTour = Tours.FirstOrDefault(tour => tour.Id == updatedTour?.Id);
+
+            // Überprüfen, ob die Tour gefunden wurde
+            if (existingTour != null)
+            {
+                // Aktualisieren Sie die Eigenschaften der vorhandenen Tour
+                existingTour.Name = updatedTour?.Name;
+                existingTour.From = updatedTour?.From;
+                existingTour.To = updatedTour?.To;
+                existingTour.Distance = updatedTour?.Distance;
+                existingTour.Time = updatedTour?.Time;
+                existingTour.Description = updatedTour?.Description;
+
+                // Benachrichtigen Sie die UI über die Änderungen
+                OnPropertyChanged(nameof(Tours));
+            }
+            else
+            {
+                // Wenn die Tour nicht gefunden wurde, geben Sie einen Fehler aus oder führen Sie eine andere geeignete Aktion aus
+                Debug.WriteLine("Tour not found for update.");
+            }
+        }
+
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public Tour? FindTourById(int id)
+        {
+            return Tours.FirstOrDefault(tour => tour.Id == id);
         }
     }
 }

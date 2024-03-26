@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System;
 
 namespace TourPlanner
 {
     public class TourLog
     {
         // Eigenschaften eines Tour-Logs
+        public int Id { get; set; } // Id-Eigenschaft hinzugefügt
         public DateTime? Date { get; set; }
         public string? Comment { get; set; }
         public string? Difficulty { get; set; }
@@ -31,6 +32,7 @@ namespace TourPlanner
 
             exampleLogs.Add(new TourLog
             {
+                Id = 1,
                 Date = DateTime.Today,
                 Comment = "First tour log",
                 Difficulty = "Easy",
@@ -41,6 +43,7 @@ namespace TourPlanner
             });
             exampleLogs.Add(new TourLog
             {
+                Id = 2,
                 Date = DateTime.Today.AddDays(-1),
                 Comment = "Second tour log",
                 Difficulty = "Moderate",
@@ -51,6 +54,7 @@ namespace TourPlanner
             });
             exampleLogs.Add(new TourLog
             {
+                Id = 3,
                 Date = DateTime.Today.AddDays(-2),
                 Comment = "Third tour log",
                 Difficulty = "Difficult",

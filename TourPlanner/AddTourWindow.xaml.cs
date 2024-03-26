@@ -1,45 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
+﻿using System.Windows;
 
 namespace TourPlanner
 {
     public partial class AddTourWindow : Window
     {
         private readonly TourViewModel viewModel;
+        private Tour? selectedTour;
 
+        // Konstruktor für das Hinzufügen einer neuen Tour
         public AddTourWindow(TourViewModel viewModel)
         {
             InitializeComponent();
             this.viewModel = viewModel;
+            selectedTour = new Tour(); // Neue Tour erstellen
+            DataContext = selectedTour; // Datenkontext auf die neue Tour setzen
+        }
+
+        // Konstruktor für das Bearbeiten einer vorhandenen Tour
+        public AddTourWindow(TourViewModel viewModel, Tour? selectedTour) : this(viewModel)
+        {
+            this.selectedTour = selectedTour;
+
+            // Laden Sie die Daten der ausgewählten Tour in die Textfelder
+            LoadSelectedTourData();
+        }
+
+        private void LoadSelectedTourData()
+        {
+            // Laden Sie die Daten der ausgewählten Tour in die Textfelder
+            NameTextBox.Text = selectedTour?.Name;
+            FromTextBox.Text = selectedTour?.From;
+            ToTextBox.Text = selectedTour?.To;
+            DistanceTextBox.Text = selectedTour?.Distance;
+            TimeTextBox.Text = selectedTour?.Time;
+            DescriptionTextBox.Text = selectedTour?.Description;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            // Erstellen Sie eine neue Tour basierend auf den Eingaben im Fenster
-            Tour newTour = new Tour
+            // Aktualisieren Sie die Daten der ausgewählten Tour
+            if (selectedTour != null)
             {
-                Name = NameTextBox.Text,
-                From = FromTextBox.Text,
-                To = FromTextBox.Text,
-                Distance = DistanceTextBox.Text,
-                Time = TimeTextBox.Text,
-                Description = DescriptionTextBox.Text
-            };
+                selectedTour.Name = NameTextBox.Text;
+                selectedTour.From = FromTextBox.Text;
+                selectedTour.To = ToTextBox.Text;
+                selectedTour.Distance = DistanceTextBox.Text;
+                selectedTour.Time = TimeTextBox.Text;
+                selectedTour.Description = DescriptionTextBox.Text;
 
-            // Fügen Sie die neue Tour zum ViewModel hinzu
-            viewModel.AddTour(newTour);
+                // Fügen Sie die Tour zum ViewModel hinzu oder aktualisieren Sie sie
+                if (viewModel.Tours != null && !viewModel.Tours.Contains(selectedTour))
+                    viewModel.AddTour(selectedTour);
+                else
+                    viewModel.UpdateTour(selectedTour);
+            }
 
             // Fenster schließen
             Close();

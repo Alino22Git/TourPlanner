@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TourPlanner"
         mc:Ignorable="d"
-        Title="Tour Planner" Height="500" Width="800"
+        Title="Tour Planner" Height="600" Width="800"
         DataContext="{Binding RelativeSource={RelativeSource Self}}" Foreground="White" Style="{DynamicResource MyStyle}">
 
 
@@ -68,13 +68,14 @@
                     <MenuItem Header="Tours" Click="AddTourMenuItem_Click"/>
                 </Menu>
 
-                <ListBox Grid.Row="1" ItemsSource="{Binding Tours}" Background="#FF312929" Foreground="White">
+                <ListBox Grid.Row="1" ItemsSource="{Binding Tours}" Background="#FF312929" Foreground="White" MouseDoubleClick="ListBoxItem_MouseDoubleClick" SelectedValuePath="Id">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}" Background="#FF312929" Foreground="White"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+
             </Grid>
         </Border>
 
@@ -123,7 +124,7 @@
                 </Grid>
 
                 <!-- ListBox für Tour-Logs -->
-                <ListBox Grid.Row="1" ItemsSource="{Binding TourLogs}" Background="#FF312929" Foreground="White" Margin="0,30,0,0">
+                <ListBox Grid.Row="1" ItemsSource="{Binding TourLogs}" Background="#FF312929" Foreground="White" Margin="0,30,0,0" MouseDoubleClick="AddTourLogMenuItem_Click">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
