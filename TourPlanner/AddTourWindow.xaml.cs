@@ -64,5 +64,18 @@ namespace TourPlanner
             // Fenster schließen
             Close();
         }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Überprüfen, ob ein Eintrag ausgewählt ist
+            if (selectedTour != null)
+            {
+                // Entfernen Sie den ausgewählten Eintrag aus der Liste
+                viewModel.Tours?.Remove(selectedTour);
+
+                // Schließen Sie das Fenster
+                Close();
+            }
+        }
     }
 }
