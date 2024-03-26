@@ -9,6 +9,8 @@ namespace TourPlanner
     {
         private readonly TourViewModel viewModel;
         private string? selectedDifficulty;
+        private string? selectedRating;
+        private TourLog? selectedTourLog;
 
         public AddTourLogWindow(TourViewModel viewModel)
         {
@@ -23,7 +25,60 @@ namespace TourPlanner
             ToursListBox.DisplayMemberPath = "Name";
         }
 
+        public AddTourLogWindow(TourViewModel viewModel, TourLog selectedTourLog) : this(viewModel)
+        {
+            // Setzen Sie die DataContext-Eigenschaft auf das ausgewählte Tour-Log, um die vorhandenen Daten anzuzeigen
+            DataContext = this.selectedTourLog = selectedTourLog;
+
+            // Laden Sie die Daten des ausgewählten Tour-Logs in die Steuerelemente des Fensters
+            LoadSelectedTourLogData();
+        }
+
+        private void LoadSelectedTourLogData()
+        {
+            // Laden Sie die Daten des ausgewählten Tour-Logs in die Steuerelemente
+            DateDatePicker.SelectedDate = selectedTourLog?.Date;
+            CommentTextBox.Text = selectedTourLog?.Comment;
+            TotalDistanceSlider.Value = selectedTourLog?.TotalDistance ?? 0;
+            TotalTimeSlider.Value = selectedTourLog?.TotalTime ?? 0;
+
+            // RadioButtons für das Wetter initialisieren
+            switch (selectedTourLog?.Weather)
+            {
+                case "Sunny":
+                    SunnyRadioButton.IsChecked = true;
+                    break;
+                case "Cloudy":
+                    CloudyRadioButton.IsChecked = true;
+                    break;
+                case "Rainy":
+                    RainyRadioButton.IsChecked = true;
+                    break;
+                case "Snowy":
+                    SnowyRadioButton.IsChecked = true;
+                    break;
+            }
+        }
+
         private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Überprüfen Sie, ob ein vorhandenes Tour-Log bearbeitet wird oder ein neues erstellt wird
+            if (selectedTourLog != null)
+            {
+                // Aktualisieren Sie die vorhandenen Tour-Log-Daten
+                UpdateSelectedTourLog();
+            }
+            else
+            {
+                // Fügen Sie ein neues Tour-Log hinzu
+                AddNewTourLog();
+            }
+
+            // Fenster schließen
+            Close();
+        }
+
+        private void AddNewTourLog()
         {
             // Runden Sie die Dezimalwerte für TotalTime und TotalDistance auf die nächste ganze Zahl
             int roundedTotalTime = (int)Math.Round(TotalTimeSlider.Value);
@@ -37,16 +92,29 @@ namespace TourPlanner
                 Difficulty = DifficultyComboBox.SelectedItem?.ToString(),
                 TotalDistance = roundedTotalDistance,
                 TotalTime = roundedTotalTime,
-                Rating = selectedDifficulty,
+                Rating = DifficultyComboBox.SelectedItem?.ToString(),
                 Weather = GetSelectedWeather(),
                 SelectedTours = GetSelectedTours() // Fügen Sie die ausgewählten Touren hinzu
             };
 
             // Fügen Sie das neue Tour-Log zum ViewModel hinzu
             viewModel.AddTourLog(newTourLog);
+        }
 
-            // Fenster schließen
-            Close();
+        private void UpdateSelectedTourLog()
+        {
+            // Aktualisieren Sie die Daten des ausgewählten Tour-Logs
+            selectedTourLog.Date = DateDatePicker.SelectedDate;
+            selectedTourLog.Comment = CommentTextBox.Text;
+            selectedTourLog.Difficulty = DifficultyComboBox.SelectedItem?.ToString();
+            selectedTourLog.TotalDistance = (int)Math.Round(TotalDistanceSlider.Value);
+            selectedTourLog.TotalTime = (int)Math.Round(TotalTimeSlider.Value);
+            selectedTourLog.Rating = RatingComboBox.SelectedItem?.ToString();
+            selectedTourLog.Weather = GetSelectedWeather();
+            selectedTourLog.SelectedTours = GetSelectedTours(); // Fügen Sie die ausgewählten Touren hinzu
+
+            // Aktualisieren Sie das Tour-Log im ViewModel
+            viewModel.UpdateTourLog(selectedTourLog);
         }
 
         private List<Tour> GetSelectedTours()
@@ -93,5 +161,19 @@ namespace TourPlanner
                 selectedDifficulty = selectedItem.Content.ToString();
             }
         }
+
+        private void RatingComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Überprüfen, ob eine Auswahl vorhanden ist
+            if (RatingComboBox.SelectedItem != null)
+            {
+                // Typkonvertierung des ausgewählten Elements zu einem ComboBoxItem
+                ComboBoxItem selectedItem = (ComboBoxItem)RatingComboBox.SelectedItem;
+
+                // Zugriff auf den Inhalt des ausgewählten Elements (z. B. Bewertung)
+                selectedRating = selectedItem.Content.ToString();
+            }
+        }
+
     }
 }

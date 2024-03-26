@@ -76,5 +76,29 @@ namespace TourPlanner
                 }
             }
         }
+
+        private void TourLogMenuItem_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // Überprüfen, ob das Ereignis ausgelöst wird
+            Debug.WriteLine("TourLogMenuItem double-clicked!");
+
+            // Überprüfen Sie den DataContext-Wert
+            if (sender is ListBox listBox)
+            {
+                // Holen Sie das ausgewählte TourLog-Objekt aus dem ListBox
+                if (listBox.SelectedItem is TourLog selectedTourLog)
+                {
+                    Debug.WriteLine($"Selected Tour Log ID: {selectedTourLog.Id}");
+                    // Öffnen Sie das AddTourLogWindow mit den Details des ausgewählten Tour-Logs
+                    AddTourLogWindow addTourLogWindow = new AddTourLogWindow(tourViewModel, selectedTourLog);
+                    addTourLogWindow.ShowDialog();
+                }
+                else
+                {
+                    Debug.WriteLine("TourLog not found in ListBox.");
+                }
+            }
+        }
+
     }
 }

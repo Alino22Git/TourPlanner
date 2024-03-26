@@ -1,19 +1,126 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace TourPlanner
 {
-    public class TourLog
+    public class TourLog : INotifyPropertyChanged
     {
-        // Eigenschaften eines Tour-Logs
-        public int Id { get; set; } // Id-Eigenschaft hinzugefügt
-        public DateTime? Date { get; set; }
-        public string? Comment { get; set; }
-        public string? Difficulty { get; set; }
-        public double TotalDistance { get; set; }
-        public double TotalTime { get; set; }
-        public string? Rating { get; set; }
-        public string? Weather { get; set; }
+        // Event für die Benachrichtigung über Änderungen
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        // Id-Eigenschaft hinzugefügt
+        private int id;
+        public int Id
+        {
+            get { return id; }
+            set
+            {
+                if (id != value)
+                {
+                    id = value;
+                    OnPropertyChanged(nameof(Id));
+                }
+            }
+        }
+
+        private DateTime? date;
+        public DateTime? Date
+        {
+            get { return date; }
+            set
+            {
+                if (date != value)
+                {
+                    date = value;
+                    OnPropertyChanged(nameof(Date));
+                }
+            }
+        }
+
+        private string? comment;
+        public string? Comment
+        {
+            get { return comment; }
+            set
+            {
+                if (comment != value)
+                {
+                    comment = value;
+                    OnPropertyChanged(nameof(Comment));
+                }
+            }
+        }
+
+        private string? difficulty;
+        public string? Difficulty
+        {
+            get { return difficulty; }
+            set
+            {
+                if (difficulty != value)
+                {
+                    difficulty = value;
+                    OnPropertyChanged(nameof(Difficulty));
+                }
+            }
+        }
+
+        private double totalDistance;
+        public double TotalDistance
+        {
+            get { return totalDistance; }
+            set
+            {
+                if (totalDistance != value)
+                {
+                    totalDistance = value;
+                    OnPropertyChanged(nameof(TotalDistance));
+                }
+            }
+        }
+
+        private double totalTime;
+        public double TotalTime
+        {
+            get { return totalTime; }
+            set
+            {
+                if (totalTime != value)
+                {
+                    totalTime = value;
+                    OnPropertyChanged(nameof(TotalTime));
+                }
+            }
+        }
+
+        private string? rating;
+        public string? Rating
+        {
+            get { return rating; }
+            set
+            {
+                if (rating != value)
+                {
+                    rating = value;
+                    OnPropertyChanged(nameof(Rating));
+                }
+            }
+        }
+
+        private string? weather;
+        public string? Weather
+        {
+            get { return weather; }
+            set
+            {
+                if (weather != value)
+                {
+                    weather = value;
+                    OnPropertyChanged(nameof(Weather));
+                }
+            }
+        }
 
         // Eine Liste von ausgewählten Touren für das Tour-Log
         public List<Tour> SelectedTours { get; set; }
@@ -65,6 +172,12 @@ namespace TourPlanner
             });
 
             return exampleLogs;
+        }
+
+        // Methode zum Auslösen des PropertyChanged-Events
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

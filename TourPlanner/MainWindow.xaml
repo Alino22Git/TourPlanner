@@ -124,7 +124,7 @@
                 </Grid>
 
                 <!-- ListBox für Tour-Logs -->
-                <ListBox Grid.Row="1" ItemsSource="{Binding TourLogs}" Background="#FF312929" Foreground="White" Margin="0,30,0,0" MouseDoubleClick="AddTourLogMenuItem_Click">
+                <ListBox Grid.Row="1" ItemsSource="{Binding TourLogs}" Background="#FF312929" Foreground="White" Margin="0,30,0,0" MouseDoubleClick="TourLogMenuItem_DoubleClick">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>

@@ -21,7 +21,7 @@
         <TextBox x:Name="CommentTextBox" Margin="0,0,0,5"/>
 
         <Label Content="Difficulty:" Foreground="White"/>
-        <ComboBox x:Name="DifficultyComboBox" SelectionChanged="DifficultyComboBox_SelectionChanged" Margin="0,0,0,5">
+        <ComboBox x:Name="DifficultyComboBox" SelectionChanged="DifficultyComboBox_SelectionChanged" Margin="0,0,0,5" >
             <ComboBoxItem Content="Easy"/>
             <ComboBoxItem Content="Moderate"/>
             <ComboBoxItem Content="Difficult"/>
@@ -36,7 +36,7 @@
         <TextBlock x:Name="TotalTimeValue" Foreground="White" Text="{Binding ElementName=TotalTimeSlider, Path=Value, StringFormat={}{0:0}}"/>
 
         <Label Content="Rating:" Foreground="White"/>
-        <ComboBox x:Name="RatingComboBox" Margin="0,0,0,5">
+        <ComboBox x:Name="RatingComboBox" SelectionChanged="DifficultyComboBox_SelectionChanged" Margin="0,0,0,5">
             <ComboBoxItem Content="1 Star"/>
             <ComboBoxItem Content="2 Stars"/>
             <ComboBoxItem Content="3 Stars"/>

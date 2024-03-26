@@ -29,8 +29,11 @@ namespace TourPlanner
             get { return tourLogs; }
             set
             {
-                tourLogs = value;
-                OnPropertyChanged(nameof(TourLogs));
+                if (tourLogs != value)
+                {
+                    tourLogs = value;
+                    OnPropertyChanged(nameof(TourLogs));
+                }
             }
         }
 
@@ -44,9 +47,9 @@ namespace TourPlanner
         {
             Tours = new ObservableCollection<Tour>()
             {
-                new Tour { Id = 1, Name = "Tour 1", From = "Location 1", To = "Location 1", Distance = "10 km", Time = "00", Description = "Description 1" },
-                new Tour { Id = 2, Name = "Tour 2", From = "Location 2", To = "Location 1", Distance = "15 km", Time = "00", Description = "Description 2" },
-                new Tour { Id = 3, Name = "Tour 3", From = "Location 3", To = "Location 1", Distance = "20 km", Time = "00", Description = "Description 3" }
+                new Tour { Id = 1, Name = "Tour 1", From = "Location 1", To = "Location 1", Distance = "10 km", Time = "2", Description = "Description 1" },
+                new Tour { Id = 2, Name = "Tour 2", From = "Location 2", To = "Location 1", Distance = "15 km", Time = "12", Description = "Description 2" },
+                new Tour { Id = 3, Name = "Tour 3", From = "Location 3", To = "Location 1", Distance = "20 km", Time = "4", Description = "Description 3" }
             };
         }
 
@@ -96,6 +99,30 @@ namespace TourPlanner
                 Debug.WriteLine("Tour not found for update.");
             }
         }
+
+        public void UpdateTourLog(TourLog selectedTourLog)
+        {
+            Debug.Assert(TourLogs != null, nameof(TourLogs) + " != null");
+
+            // Suchen Sie das zu aktualisierende Tour-Log in der Liste
+            TourLog? existingTourLog = TourLogs.FirstOrDefault(log => log.Id == selectedTourLog.Id);
+
+            // Überprüfen, ob das Tour-Log gefunden wurde
+            if (existingTourLog != null)
+            {
+                // Aktualisieren Sie die Eigenschaften des vorhandenen Tour-Logs
+                // Hier implementieren Sie die Logik zum Aktualisieren des Tour-Logs basierend auf den übergebenen Daten
+
+                // Benachrichtigen Sie die UI über die Änderungen
+                OnPropertyChanged(nameof(TourLogs));
+            }
+            else
+            {
+                // Wenn das Tour-Log nicht gefunden wurde, geben Sie einen Fehler aus oder führen Sie eine andere geeignete Aktion aus
+                Debug.WriteLine("Tour log not found for update.");
+            }
+        }
+
 
         protected void OnPropertyChanged(string propertyName)
         {
