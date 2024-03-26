@@ -4,7 +4,7 @@ namespace TourPlanner;
 
 public class Tour : INotifyPropertyChanged
 {
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private int id;
     public int Id
@@ -20,8 +20,8 @@ public class Tour : INotifyPropertyChanged
         }
     }
 
-    private string name;
-    public string Name
+    private string? name;
+    public string? Name
     {
         get { return name; }
         set

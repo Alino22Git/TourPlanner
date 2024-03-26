@@ -42,6 +42,34 @@ namespace TourPlanner
             TotalDistanceSlider.Value = selectedTourLog?.TotalDistance ?? 0;
             TotalTimeSlider.Value = selectedTourLog?.TotalTime ?? 0;
 
+            // ComboBox für den Schwierigkeitsgrad initialisieren
+            if (selectedTourLog != null && !string.IsNullOrEmpty(selectedTourLog.Difficulty))
+            {
+                // Suchen Sie nach dem entsprechenden Schwierigkeitsgrad in der ComboBox
+                foreach (var item in DifficultyComboBox.Items)
+                {
+                    if (item.ToString() == selectedTourLog.Difficulty)
+                    {
+                        DifficultyComboBox.SelectedItem = item;
+                        break;
+                    }
+                }
+            }
+
+            // Initialisieren des Ratings
+            if (selectedTourLog != null && !string.IsNullOrEmpty(selectedTourLog.Rating))
+            {
+                // Suchen Sie nach dem entsprechenden Rating in der ComboBox
+                foreach (var item in RatingComboBox.Items)
+                {
+                    if (item.ToString() == selectedTourLog.Rating)
+                    {
+                        RatingComboBox.SelectedItem = item;
+                        break;
+                    }
+                }
+            }
+
             // RadioButtons für das Wetter initialisieren
             switch (selectedTourLog?.Weather)
             {
@@ -104,17 +132,20 @@ namespace TourPlanner
         private void UpdateSelectedTourLog()
         {
             // Aktualisieren Sie die Daten des ausgewählten Tour-Logs
-            selectedTourLog.Date = DateDatePicker.SelectedDate;
-            selectedTourLog.Comment = CommentTextBox.Text;
-            selectedTourLog.Difficulty = DifficultyComboBox.SelectedItem?.ToString();
-            selectedTourLog.TotalDistance = (int)Math.Round(TotalDistanceSlider.Value);
-            selectedTourLog.TotalTime = (int)Math.Round(TotalTimeSlider.Value);
-            selectedTourLog.Rating = RatingComboBox.SelectedItem?.ToString();
-            selectedTourLog.Weather = GetSelectedWeather();
-            selectedTourLog.SelectedTours = GetSelectedTours(); // Fügen Sie die ausgewählten Touren hinzu
+            if (selectedTourLog != null)
+            {
+                selectedTourLog.Date = DateDatePicker.SelectedDate;
+                selectedTourLog.Comment = CommentTextBox.Text;
+                selectedTourLog.Difficulty = DifficultyComboBox.SelectedItem?.ToString();
+                selectedTourLog.TotalDistance = (int)Math.Round(TotalDistanceSlider.Value);
+                selectedTourLog.TotalTime = (int)Math.Round(TotalTimeSlider.Value);
+                selectedTourLog.Rating = RatingComboBox.SelectedItem?.ToString();
+                selectedTourLog.Weather = GetSelectedWeather();
+                selectedTourLog.SelectedTours = GetSelectedTours(); // Fügen Sie die ausgewählten Touren hinzu
 
-            // Aktualisieren Sie das Tour-Log im ViewModel
-            viewModel.UpdateTourLog(selectedTourLog);
+                // Aktualisieren Sie das Tour-Log im ViewModel
+                viewModel.UpdateTourLog(selectedTourLog);
+            }
         }
 
         private List<Tour> GetSelectedTours()
@@ -175,5 +206,17 @@ namespace TourPlanner
             }
         }
 
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Überprüfen, ob ein Eintrag ausgewählt ist
+            if (selectedTourLog != null)
+            {
+                // Entfernen Sie den ausgewählten Eintrag aus der Liste
+                viewModel.TourLogs?.Remove(selectedTourLog);
+
+                // Schließen Sie das Fenster
+                Close();
+            }
+        }
     }
 }

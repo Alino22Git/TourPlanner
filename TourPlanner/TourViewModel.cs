@@ -131,6 +131,7 @@ namespace TourPlanner
 
         public Tour? FindTourById(int id)
         {
+            Debug.Assert(Tours != null, nameof(Tours) + " != null");
             return Tours.FirstOrDefault(tour => tour.Id == id);
         }
     }
