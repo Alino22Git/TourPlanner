@@ -1,10 +1,30 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace TourPlanner;
 
 public class Tour : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    private ObservableCollection<TourLog> tourLogs;
+    public ObservableCollection<TourLog> TourLogs
+    {
+        get => tourLogs;
+        set
+        {
+            if (tourLogs != value)
+            {
+                tourLogs = value;
+                OnPropertyChanged(nameof(TourLogs));
+            }
+        }
+    }
+
+    public Tour()
+    {
+        TourLogs = new ObservableCollection<TourLog>();
+    }
 
     private int id;
     public int Id

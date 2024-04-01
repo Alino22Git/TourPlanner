@@ -123,7 +123,13 @@ namespace TourPlanner
                 Rating = DifficultyComboBox.SelectedItem?.ToString(),
                 Weather = GetSelectedWeather(),
                 SelectedTours = GetSelectedTours() // Fügen Sie die ausgewählten Touren hinzu
+
             };
+
+            foreach (Tour tour in newTourLog.SelectedTours)
+            {
+                tour.TourLogs.Add(newTourLog);
+            }
 
             // Fügen Sie das neue Tour-Log zum ViewModel hinzu
             viewModel.AddTourLog(newTourLog);
