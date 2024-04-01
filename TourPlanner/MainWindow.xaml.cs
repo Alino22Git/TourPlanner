@@ -82,14 +82,13 @@ namespace TourPlanner
             // Überprüfen, ob das Ereignis ausgelöst wird
             Debug.WriteLine("TourLogMenuItem double-clicked!");
 
-            // Überprüfen Sie den DataContext-Wert
+            // Überprüfen des DataContext-Werts
             if (sender is ListBox listBox)
             {
-                // Holen Sie das ausgewählte TourLog-Objekt aus dem ListBox
+                
                 if (listBox.SelectedItem is TourLog selectedTourLog)
                 {
                     Debug.WriteLine($"Selected Tour Log ID: {selectedTourLog.Id}");
-                    // Öffnen Sie das AddTourLogWindow mit den Details des ausgewählten Tour-Logs
                     AddTourLogWindow addTourLogWindow = new AddTourLogWindow(tourViewModel, selectedTourLog);
                     addTourLogWindow.ShowDialog();
                 }
@@ -103,9 +102,24 @@ namespace TourPlanner
         {
             if (sender is ListBox listBox && listBox.SelectedItem is Tour selectedTour)
             {
-                // Laden Sie die Tourlogs der ausgewählten Tour und setzen Sie sie als ItemsSource für die ListBox
+                tourViewModel.SelectedTour = selectedTour;
                 TourLogsListBox.ItemsSource = selectedTour.TourLogs;
+                GeneralMenuItem_Click(sender, e);
             }
+        }
+        private void GeneralMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (tourViewModel.SelectedTour != null)
+            {
+                DynamicContentControl.DataContext = tourViewModel;
+                DynamicContentControl.ContentTemplate = (DataTemplate)FindResource("TourDetailsTemplate");
+                DynamicContentControl.Content = tourViewModel.SelectedTour;
+            }
+        }
+
+        private void RouteMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            DynamicContentControl.ContentTemplate = (DataTemplate)FindResource("RoutePlaceholderTemplate");
         }
     }
 }
