@@ -13,6 +13,12 @@
     <Compile Update="AddTourLogWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="UserMainMenu.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="UserSearchBar.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="MainWindow.xaml">
@@ -22,6 +28,12 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="AddTourLogWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="UserMainMenu.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="UserSearchBar.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

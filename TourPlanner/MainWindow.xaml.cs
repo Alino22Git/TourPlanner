@@ -99,6 +99,13 @@ namespace TourPlanner
                 }
             }
         }
-
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ListBox listBox && listBox.SelectedItem is Tour selectedTour)
+            {
+                // Laden Sie die Tourlogs der ausgewählten Tour und setzen Sie sie als ItemsSource für die ListBox
+                TourLogsListBox.ItemsSource = selectedTour.TourLogs;
+            }
+        }
     }
 }
