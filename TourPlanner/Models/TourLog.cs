@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace TourPlanner
+namespace TourPlanner.Models
 {
     public class TourLog : INotifyPropertyChanged
     {

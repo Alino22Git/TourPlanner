@@ -11,7 +11,7 @@
 
         <Label Content="Tours:" Foreground="White"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="60">
-            <ListBox x:Name="ToursListBox" SelectionMode="Multiple" Margin="0,0,0,5" d:ItemsSource="{d:SampleData ItemCount=5}"/>
+            <ListBox x:Name="ToursListBox" SelectionMode="Single" Margin="0,0,0,5" d:ItemsSource="{d:SampleData ItemCount=5}"/>
         </ScrollViewer>
 
 <Label Content="Date:" Foreground="White"/>
@@ -51,8 +51,8 @@
         <RadioButton x:Name="SnowyRadioButton" Content="Snowy" GroupName="WeatherGroup" Foreground="White"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Save"  Margin="0,20,5,0" Padding="15,0" Click="SaveButton_Click"/>
             <Button Content="Delete" Click="DeleteButton_Click" Margin="0,20,5,0" Padding="10,2" />
-            <Button Content="Add"  Margin="0,20,5,0" Padding="15,0" Click="AddButton_Click"/>
             <Button Content="Cancel"   Margin="0,20,0,0" Padding="10,2" Click="CancelButton_Click"/>
         </StackPanel>
     </StackPanel>

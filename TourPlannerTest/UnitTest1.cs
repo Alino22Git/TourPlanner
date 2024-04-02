@@ -1,6 +1,8 @@
 using NUnit.Framework; 
 using System.Linq;
 using TourPlanner;
+using TourPlanner.Models;
+using TourPlanner.ViewModels;
 
 namespace TourPlannerTest
 {
@@ -112,6 +114,6 @@ namespace TourPlannerTest
             
         }
 
-
+        
     }
 }

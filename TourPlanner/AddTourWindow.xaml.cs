@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using TourPlanner.Models;
+using TourPlanner.ViewModels;
 
 namespace TourPlanner
 {
@@ -36,7 +38,7 @@ namespace TourPlanner
             DescriptionTextBox.Text = selectedTour?.Description;
         }
 
-        public void AddButton_Click(object sender, RoutedEventArgs e)
+        public void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             
             if (selectedTour != null)

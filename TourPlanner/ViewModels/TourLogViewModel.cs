@@ -1,12 +1,22 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TourPlanner.Models;
 
-namespace TourPlanner
+namespace TourPlanner.ViewModels
 {
-    public class TourViewModel : INotifyPropertyChanged
+    public class TourLogViewModel
     {
+        //===================================================================================================================================================================
+        //TODO: auslagerung der gesamten logik aus dem AddTourLogWindow in dieses ViewModel, sodass das ViewModel die Logik enthält und das Fenster nur noch die View ist.
+        //TODO: aufteilen des TourViewModels in TourLogViewModel und TourViewModel
+        //===================================================================================================================================================================
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private ObservableCollection<Tour>? tours;
@@ -51,34 +61,21 @@ namespace TourPlanner
             }
         }
 
-        public TourViewModel()
-        {
-            InitializeTours();
-            InitializeTourLogs();
-        }
-
-        public void InitializeTours()
-        {
-            Tours = new ObservableCollection<Tour>()
-            {
-                new Tour { Id = 1, Name = "Tour 1", From = "Location 1", To = "Location 1", Distance = "10 km", Time = "2", Description = "Description 1" },
-                new Tour { Id = 2, Name = "Tour 2", From = "Location 2", To = "Location 1", Distance = "15 km", Time = "12", Description = "Description 2" },
-                new Tour { Id = 3, Name = "Tour 3", From = "Location 3", To = "Location 1", Distance = "20 km", Time = "4", Description = "Description 3" }
-            };
-        }
-
-        private void InitializeTourLogs()
+        public TourLogViewModel()
         {
             
-            TourLogs = new ObservableCollection<TourLog>(TourLog.CreateExampleTourLogs());
         }
 
-        public void AddTour(Tour newTour)
+        
+
+        private ObservableCollection<TourLog> InitializeTourLogs()
         {
-            Debug.Assert(Tours != null, nameof(Tours) + " != null");
-            Tours.Add(newTour);
-            OnPropertyChanged(nameof(Tours)); 
+
+            TourLogs = new ObservableCollection<TourLog>(TourLog.CreateExampleTourLogs());
+            return TourLogs;
         }
+
+       
 
         public void AddTourLog(TourLog newTourLog)
         {
@@ -86,28 +83,7 @@ namespace TourPlanner
             TourLogs.Add(newTourLog);
         }
 
-        public void UpdateTour(Tour? updatedTour)
-        {
-            Debug.Assert(Tours != null, nameof(Tours) + " != null");
-
-            Tour? existingTour = Tours.FirstOrDefault(tour => tour.Id == updatedTour?.Id);
-
-            if (existingTour != null)
-            {
-                existingTour.Name = updatedTour?.Name;
-                existingTour.From = updatedTour?.From;
-                existingTour.To = updatedTour?.To;
-                existingTour.Distance = updatedTour?.Distance;
-                existingTour.Time = updatedTour?.Time;
-                existingTour.Description = updatedTour?.Description;
-
-                OnPropertyChanged(nameof(Tours));
-            }
-            else
-            {
-                Debug.WriteLine("Tour not found for update.");
-            }
-        }
+       
 
         public void DeleteTourLog(TourLog selectedTour)
         {
@@ -155,6 +131,5 @@ namespace TourPlanner
             Debug.Assert(Tours != null, nameof(Tours) + " != null");
             return Tours.FirstOrDefault(tour => tour.Id == id);
         }
-
     }
 }

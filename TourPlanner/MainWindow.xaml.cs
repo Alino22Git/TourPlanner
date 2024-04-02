@@ -15,6 +15,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TourPlanner.Models;
+using TourPlanner.ViewModels;
 
 
 namespace TourPlanner
@@ -27,24 +29,23 @@ namespace TourPlanner
         {
             InitializeComponent();
 
-            // Erstellen Sie eine Instanz des TourViewModels
+            
             tourViewModel = new TourViewModel();
 
-            // Setzen Sie das DataContext des MainWindow auf das TourViewModel,
-            // damit die Datenbindung funktioniert
+          //Setzen des Data Contexts
             DataContext = tourViewModel;
         }
 
         private void AddTourMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // Öffnen Sie das AddTourWindow und übergeben Sie das TourViewModel
+            // Öffnen des AddTourWindows und übergeben des TourViewModels
             AddTourWindow addTourWindow = new AddTourWindow(tourViewModel);
             addTourWindow.ShowDialog();
         }
 
         private void AddTourLogMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            // Öffnen Sie das AddTourWindow und übergeben Sie das TourViewModel
+            // Öffnen des AddTourLogWindows und übergeben des TourViewModels
             AddTourLogWindow addTourLogWindow = new AddTourLogWindow(tourViewModel);
             addTourLogWindow.ShowDialog();
         }
@@ -54,18 +55,18 @@ namespace TourPlanner
             // Überprüfen, ob das Ereignis ausgelöst wird
             Debug.WriteLine("ListBoxItem double-clicked!");
 
-            // Überprüfen Sie den DataContext-Wert
+            // Überprüfen des DataContext-Werts
             if (sender is ListBox listBox)
             {
-                // Holen Sie die ID des ausgewählten Elements im ListBox
+                // Holen der ID des ausgewählten Elements im ListBox
                 if (listBox.SelectedValue is int tourId)
                 {
-                    // Holen Sie das ausgewählte Tour-Objekt aus dem ViewModel
+                    // Holen des ausgewählten Tour-Objektes aus dem ViewModel
                     Tour? selectedTour = tourViewModel.FindTourById(tourId);
                     if (selectedTour != null)
                     {
                         Debug.WriteLine($"Selected Tour: {selectedTour.Name}");
-                        // Öffnen Sie das AddTourWindow mit den Details der ausgewählten Tour
+                        // Öffnen  AddTourWindow mit den Details der ausgewählten Tour
                         AddTourWindow addTourWindow = new AddTourWindow(tourViewModel, selectedTour);
                         addTourWindow.ShowDialog();
                     }

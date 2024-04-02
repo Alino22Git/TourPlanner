@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using TourPlanner.Models;
+using TourPlanner.ViewModels;
 
 namespace TourPlanner
 {
@@ -87,7 +89,7 @@ namespace TourPlanner
             }
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
            
             if (selectedTourLog != null)
@@ -129,9 +131,6 @@ namespace TourPlanner
             {
                 tour.TourLogs.Add(newTourLog);
             }
-
-            
-            viewModel.AddTourLog(newTourLog);
         }
 
         private void UpdateSelectedTourLog()
