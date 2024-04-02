@@ -10,17 +10,37 @@
 
     <Window.Resources>
         <DataTemplate x:Key="TourDetailsTemplate">
-            <StackPanel>
-                <TextBlock Text="From:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding From}"/>
-                <TextBlock Text="To:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding To}"/>
-                <TextBlock Text="Distance:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding Distance}"/>
-                <TextBlock Text="Time:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding Time}"/>
-            </StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- "From" und "To" in der ersten Zeile, "Time" und "Distance" in der zweiten Zeile -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="From:" FontWeight="Bold" Margin="0,0,5,0"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding From}" Margin="0,0,5,0"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="To:" FontWeight="Bold" Margin="0,0,5,0"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding To}" Margin="0,0,5,0"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Time:" FontWeight="Bold" Margin="0,5,5,0"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Time}" Margin="0,5,5,0"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="Distance:" FontWeight="Bold" Margin="0,5,5,0"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding Distance}" Margin="0,5,5,0"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Description:" FontWeight="Bold" Margin="0,5,5,0"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Description}" Margin="0,5,5,0"/>
+            </Grid>
         </DataTemplate>
+
+
+
         <DataTemplate x:Key="RoutePlaceholderTemplate">
             <Image Source="pack://application:,,,/Images/test.png"/>
         </DataTemplate>
@@ -46,14 +66,16 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
                     <MenuItem Header="Tours" Click="AddTourMenuItem_Click"/>
+                    <MenuItem Header="Add Tour" Click="AddTourMenuItem_Click" Background="White" Foreground="#FF312929"/>
                 </Menu>
 
-                <ListBox Grid.Row="1" ItemsSource="{Binding Tours}" Background="#FF312929" Foreground="White" 
+                <ListBox Grid.Row="2" ItemsSource="{Binding Tours}" Background="#FF312929" Foreground="White" 
                          MouseDoubleClick="ListBoxItem_MouseDoubleClick" 
                          SelectedValuePath="Id" 
                          SelectionChanged="ListBox_SelectionChanged">
@@ -87,15 +109,28 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
                     <MenuItem Header="Tour Logs" Click="AddTourLogMenuItem_Click"/>
+                    <MenuItem Header="Add Tour Log" Click="AddTourLogMenuItem_Click" Background="White" Foreground="#FF312929"/>
                 </Menu>
 
-                <ListBox x:Name="TourLogsListBox" Grid.Row="1" ItemsSource="{Binding TourLogs}" Background="#FF312929" Foreground="White" 
-                         MouseDoubleClick="TourLogMenuItem_DoubleClick">
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="150"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Date" FontWeight="Bold" Foreground="White" Margin="5"/>
+                    <TextBlock Grid.Column="1" Text="Total Time" FontWeight="Bold" Foreground="White" Margin="5"/>
+                    <TextBlock Grid.Column="2" Text="Total Distance" FontWeight="Bold" Foreground="White" Margin="5"/>
+                </Grid>
+
+                <ListBox x:Name="TourLogsListBox" Grid.Row="2" ItemsSource="{Binding TourLogs}" Background="#FF312929" Foreground="White" 
+                 MouseDoubleClick="TourLogMenuItem_DoubleClick">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>

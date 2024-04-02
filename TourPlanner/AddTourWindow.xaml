@@ -26,8 +26,8 @@
 
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Save" Click="SaveButton_Click" Margin="0,20,5,0" Padding="15,0"/>
             <Button Content="Delete" Click="DeleteButton_Click" Margin="0,20,5,0" Padding="10,2" />
-            <Button Content="Add" Click="AddButton_Click" Margin="0,20,5,0" Padding="15,0"/>
             <Button Content="Cancel" Click="CancelButton_Click"  Margin="0,20,0,0" Padding="10,2"/>
         </StackPanel>
     </StackPanel>
