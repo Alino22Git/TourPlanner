@@ -12,8 +12,10 @@ namespace TourPlanner.ViewModels
 {
     public class TourLogViewModel
     {
+        //===================================================================================================================================================================
         //TODO: auslagerung der gesamten logik aus dem AddTourLogWindow in dieses ViewModel, sodass das ViewModel die Logik enthält und das Fenster nur noch die View ist.
         //TODO: aufteilen des TourViewModels in TourLogViewModel und TourViewModel
+        //===================================================================================================================================================================
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
