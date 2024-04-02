@@ -72,7 +72,7 @@
 
                 <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
                     <MenuItem Header="Tours" Click="AddTourMenuItem_Click"/>
-                    <MenuItem Header="Add Tour" Click="AddTourMenuItem_Click" Background="White" Foreground="#FF312929"/>
+                    <MenuItem Header="Add Tour" Command="{Binding AddTourCommand}" Background="White" Foreground="#FF312929"/>
                 </Menu>
 
                 <ListBox Grid.Row="2" ItemsSource="{Binding Tours}" Background="#FF312929" Foreground="White" 

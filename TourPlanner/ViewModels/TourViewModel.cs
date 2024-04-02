@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Input;
 using TourPlanner.Models;
 
 namespace TourPlanner.ViewModels
@@ -9,6 +10,9 @@ namespace TourPlanner.ViewModels
     public class TourViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+        public ICommand AddTourCommand { get; }
+        public ICommand AddTourLogCommand { get; }
+        public ICommand AddTourLogLogicCommand { get; }
 
         private ObservableCollection<Tour>? tours;
         public ObservableCollection<Tour>? Tours
@@ -55,6 +59,21 @@ namespace TourPlanner.ViewModels
         public TourViewModel()
         {
             InitializeTours();
+            AddTourCommand = new RelayCommand(AddTour);
+            AddTourLogCommand = new RelayCommand(AddTourLog);
+        }
+
+        private void AddTourLog(object parameter)
+        {
+            // Logik zum Hinzufügen eines Tour-Logs
+            AddTourLogWindow addTourLogWindow = new AddTourLogWindow(this);
+            addTourLogWindow.ShowDialog();
+        }
+        private void AddTour(object parameter)
+        {
+            // Logik zum Hinzufügen einer Tour
+            AddTourWindow addTourWindow = new AddTourWindow(this);
+            addTourWindow.ShowDialog();
         }
 
         public void InitializeTours()
@@ -81,7 +100,7 @@ namespace TourPlanner.ViewModels
             OnPropertyChanged(nameof(Tours)); 
         }
 
-        public void AddTourLog(TourLog newTourLog)
+        public void AddTourLogLogic(TourLog newTourLog)
         {
             Debug.Assert(TourLogs != null, nameof(TourLogs) + " != null");
             TourLogs.Add(newTourLog);
