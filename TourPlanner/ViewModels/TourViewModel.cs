@@ -3,7 +3,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
-using TourPlanner.Models;
+using TourPlanner.Views;
+using TourPlannerBusinessLayer.Models;
 
 namespace TourPlanner.ViewModels
 {
@@ -63,13 +64,13 @@ namespace TourPlanner.ViewModels
             AddTourLogCommand = new RelayCommand(AddTourLog);
         }
 
-        private void AddTourLog(object parameter)
+        public void AddTourLog(object parameter)
         {
             // Logik zum Hinzufügen eines Tour-Logs
             AddTourLogWindow addTourLogWindow = new AddTourLogWindow(this);
             addTourLogWindow.ShowDialog();
         }
-        private void AddTour(object parameter)
+        public void AddTour(object parameter)
         {
             // Logik zum Hinzufügen einer Tour
             AddTourWindow addTourWindow = new AddTourWindow(this);

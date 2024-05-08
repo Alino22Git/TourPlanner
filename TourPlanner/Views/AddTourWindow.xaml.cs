@@ -1,8 +1,8 @@
 ﻿using System.Windows;
-using TourPlanner.Models;
 using TourPlanner.ViewModels;
+using TourPlannerBusinessLayer.Models;
 
-namespace TourPlanner
+namespace TourPlanner.Views
 {
     public partial class AddTourWindow : Window
     {

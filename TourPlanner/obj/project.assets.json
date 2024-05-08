@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net7.0-windows7.0": {}
+    "net7.0-windows7.0": {
+      "TourPlannerBusinessLayer/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "compile": {
+          "bin/placeholder/TourPlannerBusinessLayer.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TourPlannerBusinessLayer.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "TourPlannerBusinessLayer/1.0.0": {
+      "type": "project",
+      "path": "../TourPlannerBusinessLayer/TourPlannerBusinessLayer.csproj",
+      "msbuildProject": "../TourPlannerBusinessLayer/TourPlannerBusinessLayer.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net7.0-windows7.0": []
+    "net7.0-windows7.0": [
+      "TourPlannerBusinessLayer >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\micha\\.nuget\\packages\\": {}
@@ -33,7 +52,11 @@
       "frameworks": {
         "net7.0-windows7.0": {
           "targetAlias": "net7.0-windows",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\micha\\Desktop\\Studium\\SEM-4\\SWEN\\TourPlanner\\TourPlannerBusinessLayer\\TourPlannerBusinessLayer.csproj": {
+              "projectPath": "C:\\Users\\micha\\Desktop\\Studium\\SEM-4\\SWEN\\TourPlanner\\TourPlannerBusinessLayer\\TourPlannerBusinessLayer.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

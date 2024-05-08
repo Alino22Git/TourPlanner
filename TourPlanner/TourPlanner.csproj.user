@@ -7,33 +7,33 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="AddTourWindow.xaml.cs">
+    <Compile Update="Views\AddTourWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="AddTourLogWindow.xaml.cs">
+    <Compile Update="Views\AddTourLogWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="UserMainMenu.xaml.cs">
+    <Compile Update="Views\SubViews\UserMainMenu.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="UserSearchBar.xaml.cs">
+    <Compile Update="Views\SubViews\UserSearchBar.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="MainWindow.xaml">
+    <Page Update="Views\MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="AddTourWindow.xaml">
+    <Page Update="Views\AddTourWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="AddTourLogWindow.xaml">
+    <Page Update="Views\AddTourLogWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UserMainMenu.xaml">
+    <Page Update="Views\SubViews\UserMainMenu.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UserSearchBar.xaml">
+    <Page Update="Views\SubViews\UserSearchBar.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

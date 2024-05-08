@@ -7,14 +7,27 @@
   "targets": {
     ".NETCoreApp,Version=v7.0": {
       "TourPlanner/1.0.0": {
+        "dependencies": {
+          "TourPlannerBusinessLayer": "1.0.0"
+        },
         "runtime": {
           "TourPlanner.dll": {}
+        }
+      },
+      "TourPlannerBusinessLayer/1.0.0": {
+        "runtime": {
+          "TourPlannerBusinessLayer.dll": {}
         }
       }
     }
   },
   "libraries": {
     "TourPlanner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TourPlannerBusinessLayer/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

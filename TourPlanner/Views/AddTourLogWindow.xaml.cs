@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using TourPlanner.Models;
 using TourPlanner.ViewModels;
+using TourPlannerBusinessLayer.Models;
 
-namespace TourPlanner
+namespace TourPlanner.Views
 {
     public partial class AddTourLogWindow : Window
     {
@@ -18,11 +18,7 @@ namespace TourPlanner
         {
             InitializeComponent();
             this.viewModel = viewModel;
-
-           
             DataContext = viewModel;
-
-            
             ToursListBox.ItemsSource = viewModel.Tours;
             ToursListBox.DisplayMemberPath = "Name";
         }

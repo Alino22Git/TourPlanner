@@ -1,8 +1,8 @@
 using NUnit.Framework; 
 using System.Linq;
 using TourPlanner;
-using TourPlanner.Models;
 using TourPlanner.ViewModels;
+using TourPlannerBusinessLayer.Models;
 
 namespace TourPlannerTest
 {

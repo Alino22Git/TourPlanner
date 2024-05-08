@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TourPlannerBusinessLayer\TourPlannerBusinessLayer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Images\test.png" />
   </ItemGroup>
 

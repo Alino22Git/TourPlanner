@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
-namespace TourPlanner.Models
+namespace TourPlannerBusinessLayer.Models
 {
     public class TourLog : INotifyPropertyChanged
     {
