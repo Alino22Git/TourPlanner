@@ -8,102 +8,72 @@ using TourPlannerBusinessLayer.Models;
 namespace TourPlanner.Views
 {
     public partial class MainWindow : Window
+{
+    private readonly MainViewModel mainViewModel;
+
+    public MainWindow()
     {
-        private readonly TourViewModel tourViewModel;
+        InitializeComponent();
+        mainViewModel = new MainViewModel();
+        DataContext = mainViewModel;
+    }
 
-        public MainWindow()
+    private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is ListBox listBox && listBox.SelectedItem is Tour selectedTour)
         {
-            InitializeComponent();
-            tourViewModel = new TourViewModel();
-          //Setzen des Data Contexts
-            DataContext = tourViewModel;
-        }
-
-        private void AddTourMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            // Öffnen des AddTourWindows und übergeben des TourViewModels
-            AddTourWindow addTourWindow = new AddTourWindow(tourViewModel);
-            addTourWindow.ShowDialog();
-        }
-
-        private void AddTourLogMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            // Öffnen des AddTourLogWindows und übergeben des TourViewModels
-            AddTourLogWindow addTourLogWindow = new AddTourLogWindow(tourViewModel);
-            addTourLogWindow.ShowDialog();
-        }
-
-        private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            // Überprüfen, ob das Ereignis ausgelöst wird
-            Debug.WriteLine("ListBoxItem double-clicked!");
-
-            // Überprüfen des DataContext-Werts
-            if (sender is ListBox listBox)
+            // Übergib die ursprüngliche Tour, um sie zu bearbeiten
+            var addTourWindow = new AddTourWindow(mainViewModel.TourViewModel, selectedTour);
+            bool? result = addTourWindow.ShowDialog();
+            // Nur aktualisieren, wenn tatsächlich gespeichert wurde
+            if (result == true)
             {
-                // Holen der ID des ausgewählten Elements im ListBox
-                if (listBox.SelectedValue is int tourId)
-                {
-                    // Holen des ausgewählten Tour-Objektes aus dem ViewModel
-                    Tour? selectedTour = tourViewModel.FindTourById(tourId);
-                    if (selectedTour != null)
-                    {
-                        Debug.WriteLine($"Selected Tour: {selectedTour.Name}");
-                        // Öffnen  AddTourWindow mit den Details der ausgewählten Tour
-                        AddTourWindow addTourWindow = new AddTourWindow(tourViewModel, selectedTour);
-                        addTourWindow.ShowDialog();
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"Tour with ID {tourId} not found.");
-                    }
-                }
+                mainViewModel.TourViewModel.OnPropertyChanged(nameof(mainViewModel.TourViewModel.Tours));
             }
-        }
-
-        private void TourLogMenuItem_DoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            // Überprüfen, ob das Ereignis ausgelöst wird
-            Debug.WriteLine("TourLogMenuItem double-clicked!");
-
-            // Überprüfen des DataContext-Werts
-            if (sender is ListBox listBox)
-            {
-                
-                if (listBox.SelectedItem is TourLog selectedTourLog)
-                {
-                    Debug.WriteLine($"Selected Tour Log ID: {selectedTourLog.Id}");
-                    AddTourLogWindow addTourLogWindow = new AddTourLogWindow(tourViewModel, selectedTourLog);
-                    addTourLogWindow.ShowDialog();
-                }
-                else
-                {
-                    Debug.WriteLine("TourLog not found in ListBox.");
-                }
-            }
-        }
-        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (sender is ListBox listBox && listBox.SelectedItem is Tour selectedTour)
-            {
-                tourViewModel.SelectedTour = selectedTour;
-                TourLogsListBox.ItemsSource = selectedTour.TourLogs;
-                GeneralMenuItem_Click(sender, e);
-            }
-        }
-        private void GeneralMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (tourViewModel.SelectedTour != null)
-            {
-                DynamicContentControl.DataContext = tourViewModel;
-                DynamicContentControl.ContentTemplate = (DataTemplate)FindResource("TourDetailsTemplate");
-                DynamicContentControl.Content = tourViewModel.SelectedTour;
-            }
-        }
-
-        private void RouteMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            DynamicContentControl.ContentTemplate = (DataTemplate)FindResource("RoutePlaceholderTemplate");
         }
     }
+
+
+        private void TourLogMenuItem_DoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        Debug.WriteLine("TourLogMenuItem double-clicked!");
+
+        if (sender is ListBox listBox && listBox.SelectedItem is TourLog selectedTourLog)
+        {
+            Debug.WriteLine($"Selected Tour Log ID: {selectedTourLog.Id}");
+            var addTourLogWindow = new AddTourLogWindow(mainViewModel.TourLogViewModel);
+            addTourLogWindow.ShowDialog();
+        }
+        else
+        {
+            Debug.WriteLine("TourLog not found in ListBox.");
+        }
+    }
+
+    private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ListBox listBox && listBox.SelectedItem is Tour selectedTour)
+        {
+            mainViewModel.TourViewModel.SelectedTour = selectedTour;
+
+            TourLogsListBox.ItemsSource = selectedTour.TourLogs;
+            GeneralMenuItem_Click(sender, e);
+        }
+    }
+         
+    private void GeneralMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (mainViewModel.TourViewModel.SelectedTour != null)
+        {
+            DynamicContentControl.DataContext = mainViewModel.TourViewModel;
+            DynamicContentControl.ContentTemplate = (DataTemplate)FindResource("TourDetailsTemplate");
+            DynamicContentControl.Content = mainViewModel.TourViewModel.SelectedTour;
+        }
+    }
+
+    private void RouteMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        DynamicContentControl.ContentTemplate = (DataTemplate)FindResource("RoutePlaceholderTemplate");
+    }
+}
 }

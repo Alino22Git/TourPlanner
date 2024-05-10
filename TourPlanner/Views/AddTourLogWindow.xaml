@@ -7,53 +7,29 @@
         mc:Ignorable="d"
         Title="Tour Log" Height="620" Width="400"
         DataContext="{Binding RelativeSource={RelativeSource Self}}" Foreground="White" Style="{DynamicResource MyStyle}">
+
     <StackPanel Margin="10">
-
-        <Label Content="Tours:" Foreground="White"/>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="60">
-            <ListBox x:Name="ToursListBox" SelectionMode="Single" Margin="0,0,0,5" d:ItemsSource="{d:SampleData ItemCount=5}"/>
-        </ScrollViewer>
-
-<Label Content="Date:" Foreground="White"/>
-        <DatePicker x:Name="DateDatePicker" Margin="0,0,0,5"/>
+        <Label Content="Date:" Foreground="White"/>
+        <DatePicker SelectedDate="{Binding SelectedDate}" Margin="0,0,0,5"/>
 
         <Label Content="Comment:" Foreground="White"/>
-        <TextBox x:Name="CommentTextBox" Margin="0,0,0,5"/>
+        <TextBox Text="{Binding SelectedComment}" Margin="0,0,0,5"/>
 
         <Label Content="Difficulty:" Foreground="White"/>
-        <ComboBox x:Name="DifficultyComboBox" SelectionChanged="DifficultyComboBox_SelectionChanged" Margin="0,0,0,5" >
-            <ComboBoxItem Content="Easy"/>
-            <ComboBoxItem Content="Moderate"/>
-            <ComboBoxItem Content="Difficult"/>
-        </ComboBox>
+        <ComboBox ItemsSource="{Binding DifficultyOptions}" SelectedItem="{Binding SelectedDifficulty}" />
 
         <Label Content="Total Distance:" Foreground="White"/>
-        <Slider x:Name="TotalDistanceSlider" Margin="0,0,0,5" Minimum="0" Maximum="500"/>
-        <TextBlock x:Name="TotalDistanceValue" Foreground="White" Text="{Binding ElementName=TotalDistanceSlider, Path=Value, StringFormat={}{0:0}}"/>
+        <Slider Minimum="0" Maximum="500" Value="{Binding SelectedTotalDistance}" Margin="0,0,0,5"/>
+        <TextBlock Foreground="White" Text="{Binding SelectedTotalDistance, StringFormat={}{0:0}}"/>
 
         <Label Content="Total Time:" Foreground="White"/>
-        <Slider x:Name="TotalTimeSlider" Margin="0,0,0,5" Minimum="0" Maximum="72"/>
-        <TextBlock x:Name="TotalTimeValue" Foreground="White" Text="{Binding ElementName=TotalTimeSlider, Path=Value, StringFormat={}{0:0}}"/>
-
-        <Label Content="Rating:" Foreground="White"/>
-        <ComboBox x:Name="RatingComboBox" SelectionChanged="DifficultyComboBox_SelectionChanged" Margin="0,0,0,5">
-            <ComboBoxItem Content="1 Star"/>
-            <ComboBoxItem Content="2 Stars"/>
-            <ComboBoxItem Content="3 Stars"/>
-            <ComboBoxItem Content="4 Stars"/>
-            <ComboBoxItem Content="5 Stars"/>
-        </ComboBox>
-
-        <Label Content="Weather:" Foreground="White"/>
-        <RadioButton x:Name="SunnyRadioButton" Content="Sunny" GroupName="WeatherGroup" Foreground="White"/>
-        <RadioButton x:Name="CloudyRadioButton" Content="Cloudy" GroupName="WeatherGroup" Foreground="White"/>
-        <RadioButton x:Name="RainyRadioButton" Content="Rainy" GroupName="WeatherGroup" Foreground="White"/>
-        <RadioButton x:Name="SnowyRadioButton" Content="Snowy" GroupName="WeatherGroup" Foreground="White"/>
+        <Slider Minimum="0" Maximum="72" Value="{Binding SelectedTotalTime}" Margin="0,0,0,5"/>
+        <TextBlock Foreground="White" Text="{Binding SelectedTotalTime, StringFormat={}{0:0}}"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Save"  Margin="0,20,5,0" Padding="15,0" Click="SaveButton_Click"/>
-            <Button Content="Delete" Click="DeleteButton_Click" Margin="0,20,5,0" Padding="10,2" />
-            <Button Content="Cancel"   Margin="0,20,0,0" Padding="10,2" Click="CancelButton_Click"/>
+            <Button Content="Save" Command="{Binding AddTourLogCommand}" Margin="0,20,5,0" Padding="15,0"/>
+            <Button Content="Update" Command="{Binding UpdateTourLogCommand}" Margin="0,20,5,0" Padding="15,0"/>
+            <Button Content="Delete" Command="{Binding DeleteTourLogCommand}" Margin="0,20,5,0" Padding="10,2"/>
         </StackPanel>
     </StackPanel>
 </Window>

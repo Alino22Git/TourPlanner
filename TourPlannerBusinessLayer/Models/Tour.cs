@@ -53,12 +53,80 @@ public class Tour : INotifyPropertyChanged
             }
         }
     }
-    public string? From { get; set; }
-    public string? To { get; set; }
-    public string? Distance { get; set; }
-    public string? Time { get; set; }
-    public string? Description { get; set; }
+    private string? from;
+    public string? From
+    {
+        get => from;
+        set
+        {
+            if (from != value)
+            {
+                from = value;
+                OnPropertyChanged(nameof(From));
+            }
+        }
+    }
 
+    private string? to;
+
+    public string? To
+    {
+        get => to;
+        set
+        {
+            if (to != value)
+            {
+                to = value;
+                OnPropertyChanged(nameof(To));
+            }
+        }
+    }
+    
+    private string? distance;
+
+    public string? Distance
+    {
+        get => distance;
+        set
+        {
+            if (distance != value)
+            {
+                distance = value;
+                OnPropertyChanged(nameof(Distance));
+            }
+        }
+    }
+
+    private string time;
+
+    public string? Time
+    {
+        get => time;
+        set
+        {
+            if (time != value)
+            {
+                time = value;
+                OnPropertyChanged(nameof(Time));
+            }
+        }
+    }
+
+    private string description;
+
+    public string? Description
+    {
+        get => description;
+        set
+        {
+            if (description != value)
+            {
+                description = value;
+                OnPropertyChanged(nameof(Description));
+            }
+        }
+    }
+   
     protected void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

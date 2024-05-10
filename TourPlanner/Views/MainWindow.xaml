@@ -40,8 +40,6 @@
             </Grid>
         </DataTemplate>
 
-
-
         <DataTemplate x:Key="RoutePlaceholderTemplate">
             <Image Source="pack://application:,,,/Images/test.png"/>
         </DataTemplate>
@@ -72,11 +70,11 @@
                 </Grid.RowDefinitions>
 
                 <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
-                    <MenuItem Header="Tours" Click="AddTourMenuItem_Click"/>
-                    <MenuItem Header="Add Tour" Command="{Binding AddTourCommand}" Background="White" Foreground="#FF312929"/>
+                    <MenuItem Header="Tours" Command="{Binding OpenAddTourWindowCommand}" />
+                    <MenuItem Header="Add Tour" Command="{Binding OpenAddTourWindowCommand}" Background="White" Foreground="#FF312929"/>
                 </Menu>
 
-                <ListBox Grid.Row="2" ItemsSource="{Binding Tours}" Background="#FF312929" Foreground="White" 
+                <ListBox Grid.Row="2" ItemsSource="{Binding TourViewModel.Tours}" Background="#FF312929" Foreground="White" 
                          MouseDoubleClick="ListBoxItem_MouseDoubleClick" 
                          SelectedValuePath="Id" 
                          SelectionChanged="ListBox_SelectionChanged">
@@ -115,8 +113,8 @@
                 </Grid.RowDefinitions>
 
                 <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
-                    <MenuItem Header="Tour Logs" Click="AddTourLogMenuItem_Click"/>
-                    <MenuItem Header="Add Tour Log" Click="AddTourLogMenuItem_Click" Background="White" Foreground="#FF312929"/>
+                    <MenuItem Header="Add Tour" Command="{Binding OpenAddTourWindowCommand}" />
+                    <MenuItem Header="Add Tour Log" Command="{Binding OpenAddTourLogWindowCommand}" />
                 </Menu>
 
                 <Grid Grid.Row="1">
@@ -130,7 +128,7 @@
                     <TextBlock Grid.Column="2" Text="Total Distance" FontWeight="Bold" Foreground="White" Margin="5"/>
                 </Grid>
 
-                <ListBox x:Name="TourLogsListBox" Grid.Row="2" ItemsSource="{Binding TourLogs}" Background="#FF312929" Foreground="White" 
+                <ListBox x:Name="TourLogsListBox" Grid.Row="2" ItemsSource="{Binding TourLogViewModel.TourLogs}" SelectedItem="{Binding TourLogViewModel.SelectedTourLog}" Background="#FF312929" Foreground="White" 
                  MouseDoubleClick="TourLogMenuItem_DoubleClick">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
