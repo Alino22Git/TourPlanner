@@ -1,6 +1,10 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using TourPlanner.Views;
 using TourPlannerBusinessLayer.Models;
 
 namespace TourPlanner.ViewModels
@@ -18,8 +22,16 @@ namespace TourPlanner.ViewModels
         public ICommand SetGeneralContentCommand { get; }
         public ICommand SetRouteContentCommand { get; }
 
-        public MainViewModel()
+        public ICommand ListBoxItemDoubleClickCommand { get; }
+        public ICommand TourLogMenuItemDoubleClickCommand { get; }
+        public ICommand ListBoxSelectionChangedCommand { get; }
+
+        private ContentControl _dynamicContentControl;
+
+        public MainViewModel(ContentControl dynamicContentControl)
         {
+            _dynamicContentControl = dynamicContentControl;
+
             TourViewModel = new TourViewModel();
             TourLogViewModel = new TourLogViewModel(TourViewModel);
             TourViewModel.PropertyChanged += (s, e) =>
@@ -27,27 +39,36 @@ namespace TourPlanner.ViewModels
                 if (e.PropertyName == nameof(TourViewModel.SelectedTour))
                 {
                     TourLogViewModel.SelectedTour = TourViewModel.SelectedTour;
+                    Debug.WriteLine($"SelectedTour changed: {TourViewModel.SelectedTour?.Name}");
                 }
             };
+            Debug.WriteLine($"SelectedTour changed: {TourViewModel.SelectedTour?.Name}");
+
             OpenAddTourWindowCommand = new RelayCommand(OpenAddTourWindow);
             OpenAddTourLogWindowCommand = new RelayCommand(OpenAddTourLogWindow);
             SetGeneralContentCommand = new RelayCommand(SetGeneralContent);
             SetRouteContentCommand = new RelayCommand(SetRouteContent);
+
+            ListBoxItemDoubleClickCommand = new RelayCommand(ListBoxItemDoubleClick);
+            TourLogMenuItemDoubleClickCommand = new RelayCommand(TourLogMenuItemDoubleClick);
+            ListBoxSelectionChangedCommand = new RelayCommand(ListBoxSelectionChanged);
         }
-
-
-        
-
 
         private void SetGeneralContent(object parameter)
         {
-            // Logik, um den Content zu setzen
+            if (TourViewModel.SelectedTour != null)
+            {
+                _dynamicContentControl.DataContext = TourViewModel;
+                _dynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
+                _dynamicContentControl.Content = TourViewModel.SelectedTour;
+            }
         }
 
         private void SetRouteContent(object parameter)
         {
-            // Logik, um den Content zu setzen
+            _dynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("RoutePlaceholderTemplate");
         }
+
         private void OpenAddTourWindow(object? parameter)
         {
             TourViewModel.CreateNewTour(parameter);
@@ -55,8 +76,55 @@ namespace TourPlanner.ViewModels
 
         private void OpenAddTourLogWindow(object? parameter)
         {
-            var addTourLogWindow = new Views.AddTourLogWindow(TourLogViewModel);
+            var addTourLogWindow = new AddTourLogWindow(TourLogViewModel);
             addTourLogWindow.ShowDialog();
+        }
+
+        private void ListBoxItemDoubleClick(object parameter)
+        {
+            Debug.WriteLine("ListBoxItemDoubleClick called");
+            if (parameter == null)
+            {
+                Debug.WriteLine("Parameter is null");
+            }
+            else
+            {
+                Debug.WriteLine($"Parameter type: {parameter.GetType()}");
+            }
+
+            if (parameter is Tour selectedTour)
+            {
+                Debug.WriteLine("Parameter is Tour");
+                var addTourWindow = new AddTourWindow(TourViewModel, selectedTour);
+                bool? result = addTourWindow.ShowDialog();
+                if (result == true)
+                {
+                    TourViewModel.OnPropertyChanged(nameof(TourViewModel.Tours));
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Parameter is not Tour");
+            }
+        }
+
+        private void TourLogMenuItemDoubleClick(object parameter)
+        {
+            if (parameter is TourLog selectedTourLog)
+            {
+                var addTourLogWindow = new AddTourLogWindow(TourLogViewModel);
+                addTourLogWindow.ShowDialog();
+            }
+        }
+
+        private void ListBoxSelectionChanged(object parameter)
+        {
+            if (parameter is Tour selectedTour)
+            {
+                TourViewModel.SelectedTour = selectedTour;
+                TourLogViewModel.TourLogs = selectedTour.TourLogs;
+                SetGeneralContent(null);
+            }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)

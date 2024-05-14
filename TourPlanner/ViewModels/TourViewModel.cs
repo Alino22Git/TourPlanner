@@ -12,11 +12,9 @@ namespace TourPlanner.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        // Commands
         public ICommand SaveTourCommand { get; }
         public ICommand DeleteTourCommand { get; }
 
-        // Eigenschaften für die Touren
         private ObservableCollection<Tour>? tours;
         public ObservableCollection<Tour>? Tours
         {
@@ -45,7 +43,6 @@ namespace TourPlanner.ViewModels
             }
         }
 
-        // Zum Bearbeiten einer bestehenden Tour
         private Tour? OriginalTour { get; set; }
 
         public TourViewModel()
@@ -57,7 +54,6 @@ namespace TourPlanner.ViewModels
 
         private void InitializeTours()
         {
-            // Beispiel-Touren erstellen
             Tours = new ObservableCollection<Tour>
             {
                 new Tour { Id = 1, Name = "Tour 1", From = "Location 1", To = "Location 1", Distance = "10 km", Time = "2", Description = "Description 1", TourLogs = new ObservableCollection<TourLog>() },
@@ -65,12 +61,10 @@ namespace TourPlanner.ViewModels
                 new Tour { Id = 3, Name = "Tour 3", From = "Location 3", To = "Location 1", Distance = "20 km", Time = "4", Description = "Description 3" }
             };
 
-            // Beispiel-TourLogs hinzufügen, nur für die erste Tour
             var exampleTourLogs = TourLog.CreateExampleTourLogs();
             Tours[0].TourLogs = new ObservableCollection<TourLog>(exampleTourLogs);
         }
 
-        // Startet die Bearbeitung der Tour und öffnet das AddTourWindow
         public void OpenTourWindow(Tour originalTour)
         {
             StartEditing(originalTour);
@@ -80,10 +74,6 @@ namespace TourPlanner.ViewModels
 
         public void StartEditing(Tour originalTour)
         {
-            if (originalTour == null)
-            {
-
-            }
             OriginalTour = originalTour;
             SelectedTour = new Tour
             {
@@ -98,6 +88,7 @@ namespace TourPlanner.ViewModels
             };
             OnPropertyChanged(nameof(SelectedTour));
         }
+
         public void CreateNewTour(object? parameter)
         {
             OriginalTour = null;
@@ -105,6 +96,7 @@ namespace TourPlanner.ViewModels
             var addTourWindow = new AddTourWindow(this, SelectedTour);
             addTourWindow.ShowDialog();
         }
+
         private void SaveTour(object? parameter)
         {
             if (OriginalTour != null && SelectedTour != null)
@@ -121,7 +113,6 @@ namespace TourPlanner.ViewModels
                     Tours.Add(OriginalTour);
                 }
 
-                // Schließen des Fensters nach dem Speichern
                 if (parameter is Window window)
                 {
                     window.DialogResult = true;
@@ -134,23 +125,14 @@ namespace TourPlanner.ViewModels
         {
             if (SelectedTour != null && Tours != null)
             {
-                // Finden der Tour, die gelöscht werden soll, anhand der Id
                 var tourToDelete = Tours.FirstOrDefault(t => t.Id == SelectedTour.Id);
-
-                // Nur löschen, wenn die Tour gefunden wird
                 if (tourToDelete != null)
                 {
                     Tours.Remove(tourToDelete);
                 }
-
-                // `SelectedTour` auf `null` setzen
                 SelectedTour = null;
-
-                // Aktualisieren Sie die UI-Komponenten
                 OnPropertyChanged(nameof(Tours));
                 OnPropertyChanged(nameof(SelectedTour));
-
-                // Schließen Sie das Fenster, falls erforderlich
                 if (parameter is Window window)
                 {
                     window.DialogResult = true;
@@ -158,8 +140,6 @@ namespace TourPlanner.ViewModels
                 }
             }
         }
-
-
 
         public void OnPropertyChanged(string propertyName)
         {

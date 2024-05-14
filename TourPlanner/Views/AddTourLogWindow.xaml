@@ -27,7 +27,7 @@
         <TextBlock Foreground="White" Text="{Binding SelectedTotalTime, StringFormat={}{0:0}}"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Save" Command="{Binding AddTourLogCommand}" Margin="0,20,5,0" Padding="15,0"/>
+            <Button Content="Save" Command="{Binding SaveTourLogCommand}" Margin="0,20,5,0" Padding="15,0"/>
             <Button Content="Update" Command="{Binding UpdateTourLogCommand}" Margin="0,20,5,0" Padding="15,0"/>
             <Button Content="Delete" Command="{Binding DeleteTourLogCommand}" Margin="0,20,5,0" Padding="10,2"/>
         </StackPanel>

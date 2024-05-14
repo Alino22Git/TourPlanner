@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TourPlanner"
         xmlns:subViews="clr-namespace:TourPlanner.Views.SubViews"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="Tour Planner" Height="600" Width="800"
         DataContext="{Binding RelativeSource={RelativeSource Self}}" Foreground="White" Style="{DynamicResource MyStyle}">
@@ -24,7 +25,6 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- "From" und "To" in der ersten Zeile, "Time" und "Distance" in der zweiten Zeile -->
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="From:" FontWeight="Bold" Margin="0,0,5,0"/>
                 <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding From}" Margin="0,0,5,0"/>
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="To:" FontWeight="Bold" Margin="0,0,5,0"/>
@@ -75,14 +75,23 @@
                 </Menu>
 
                 <ListBox Grid.Row="2" ItemsSource="{Binding TourViewModel.Tours}" Background="#FF312929" Foreground="White" 
-                         MouseDoubleClick="ListBoxItem_MouseDoubleClick" 
                          SelectedValuePath="Id" 
-                         SelectionChanged="ListBox_SelectionChanged">
+                         SelectedItem="{Binding TourViewModel.SelectedTour}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}" Background="#FF312929" Foreground="White"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <i:InvokeCommandAction Command="{Binding ListBoxItemDoubleClickCommand}" 
+                                                   CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding ListBoxSelectionChangedCommand}" 
+                                                   CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </ListBox>
             </Grid>
         </Border>
@@ -95,8 +104,8 @@
                 </Grid.RowDefinitions>
 
                 <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
-                    <MenuItem Header="General" Click="GeneralMenuItem_Click"/>
-                    <MenuItem Header="Route" Click="RouteMenuItem_Click"/>
+                    <MenuItem Header="General" Command="{Binding SetGeneralContentCommand}"/>
+                    <MenuItem Header="Route" Command="{Binding SetRouteContentCommand}"/>
                     <MenuItem Header="Misc"/>
                 </Menu>
 
@@ -128,8 +137,7 @@
                     <TextBlock Grid.Column="2" Text="Total Distance" FontWeight="Bold" Foreground="White" Margin="5"/>
                 </Grid>
 
-                <ListBox x:Name="TourLogsListBox" Grid.Row="2" ItemsSource="{Binding TourLogViewModel.TourLogs}" SelectedItem="{Binding TourLogViewModel.SelectedTourLog}" Background="#FF312929" Foreground="White" 
-                 MouseDoubleClick="TourLogMenuItem_DoubleClick">
+                <ListBox x:Name="TourLogsListBox" Grid.Row="2" ItemsSource="{Binding TourLogViewModel.TourLogs}" SelectedItem="{Binding TourLogViewModel.SelectedTourLog}" Background="#FF312929" Foreground="White">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -144,6 +152,12 @@
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <i:InvokeCommandAction Command="{Binding TourLogMenuItemDoubleClickCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                        </i:EventTrigger>
+
+                    </i:Interaction.Triggers>
                 </ListBox>
             </Grid>
         </Border>

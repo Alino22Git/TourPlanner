@@ -99,3 +99,4 @@ C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\obj\Debug\net7
 C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\TourPlannerBusinessLayer.dll
 C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\TourPlannerBusinessLayer.pdb
 C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\obj\Debug\net7.0-windows\TourPlanner.csproj.CopyComplete
+C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\Microsoft.Xaml.Behaviors.dll
