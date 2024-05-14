@@ -1,35 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TourPlanner.Models;
+using System.Windows;
+using System.Windows.Input;
+using TourPlanner.Views;
+using TourPlannerBusinessLayer.Models;
 
 namespace TourPlanner.ViewModels
 {
-    public class TourLogViewModel
+    public class TourLogViewModel : INotifyPropertyChanged
     {
-        //===================================================================================================================================================================
-        //TODO: auslagerung der gesamten logik aus dem AddTourLogWindow in dieses ViewModel, sodass das ViewModel die Logik enthält und das Fenster nur noch die View ist.
-        //TODO: aufteilen des TourViewModels in TourLogViewModel und TourViewModel
-        //===================================================================================================================================================================
-
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        private ObservableCollection<Tour>? tours;
-        public ObservableCollection<Tour>? Tours
+        public ICommand SaveTourLogCommand { get; }
+        public ICommand DeleteTourLogCommand { get; }
+
+        private TourLog? selectedTourLog;
+        public TourLog? SelectedTourLog
         {
-            get { return tours; }
+            get { return selectedTourLog; }
             set
             {
-                if (tours != value)
-                {
-                    tours = value;
-                    OnPropertyChanged(nameof(Tours));
-                }
+                selectedTourLog = value;
+                OnPropertyChanged(nameof(SelectedTourLog));
+                LoadSelectedTourLogData();
             }
         }
 
@@ -39,11 +35,75 @@ namespace TourPlanner.ViewModels
             get { return selectedTour; }
             set
             {
-                if (selectedTour != value)
-                {
-                    selectedTour = value;
-                    OnPropertyChanged(nameof(SelectedTour));
-                }
+                selectedTour = value;
+                OnPropertyChanged(nameof(SelectedTour));
+                UpdateTourLogs();
+            }
+        }
+
+        private DateTime? selectedDate;
+        public DateTime? SelectedDate
+        {
+            get { return selectedDate; }
+            set
+            {
+                selectedDate = value;
+                OnPropertyChanged(nameof(SelectedDate));
+            }
+        }
+
+        private double selectedTotalDistance;
+        public double SelectedTotalDistance
+        {
+            get { return selectedTotalDistance; }
+            set
+            {
+                selectedTotalDistance = value;
+                OnPropertyChanged(nameof(SelectedTotalDistance));
+            }
+        }
+
+        private double selectedTotalTime;
+        public double SelectedTotalTime
+        {
+            get { return selectedTotalTime; }
+            set
+            {
+                selectedTotalTime = value;
+                OnPropertyChanged(nameof(SelectedTotalTime));
+            }
+        }
+
+        private string? selectedComment;
+        public string? SelectedComment
+        {
+            get { return selectedComment; }
+            set
+            {
+                selectedComment = value;
+                OnPropertyChanged(nameof(SelectedComment));
+            }
+        }
+
+        private string? selectedDifficulty;
+        public string? SelectedDifficulty
+        {
+            get { return selectedDifficulty; }
+            set
+            {
+                selectedDifficulty = value;
+                OnPropertyChanged(nameof(SelectedDifficulty));
+            }
+        }
+
+        private string? selectedWeather;
+        public string? SelectedWeather
+        {
+            get { return selectedWeather; }
+            set
+            {
+                selectedWeather = value;
+                OnPropertyChanged(nameof(SelectedWeather));
             }
         }
 
@@ -53,83 +113,143 @@ namespace TourPlanner.ViewModels
             get { return tourLogs; }
             set
             {
-                if (tourLogs != value)
-                {
-                    tourLogs = value;
-                    OnPropertyChanged(nameof(TourLogs));
-                }
-            }
-        }
-
-        public TourLogViewModel()
-        {
-            
-        }
-
-        
-
-        private ObservableCollection<TourLog> InitializeTourLogs()
-        {
-
-            TourLogs = new ObservableCollection<TourLog>(TourLog.CreateExampleTourLogs());
-            return TourLogs;
-        }
-
-       
-
-        public void AddTourLog(TourLog newTourLog)
-        {
-            Debug.Assert(TourLogs != null, nameof(TourLogs) + " != null");
-            TourLogs.Add(newTourLog);
-        }
-
-       
-
-        public void DeleteTourLog(TourLog selectedTour)
-        {
-            Debug.Assert(Tours != null, nameof(Tours) + " != null");
-
-            if (selectedTour != null)
-            {
-                TourLogs.Remove(selectedTour);
-                OnPropertyChanged(nameof(Tours));
-            }
-            else
-            {
-                Debug.WriteLine("Tour not found for delete.");
-            }
-        }
-
-        public void UpdateTourLog(TourLog selectedTourLog)
-        {
-            Debug.Assert(TourLogs != null, nameof(TourLogs) + " != null");
-
-            TourLog? existingTourLog = TourLogs.FirstOrDefault(log => log.Id == selectedTourLog.Id);
-
-            if (existingTourLog != null)
-            {
-                existingTourLog.Date = selectedTourLog.Date;
-                existingTourLog.Comment = selectedTourLog.Comment;
-                existingTourLog.Difficulty = selectedTourLog.Difficulty;
-                existingTourLog.TotalDistance = selectedTourLog.TotalDistance;
-                existingTourLog.TotalTime = selectedTourLog.TotalTime;
+                tourLogs = value;
                 OnPropertyChanged(nameof(TourLogs));
             }
+        }
+
+        public ObservableCollection<string> DifficultyOptions { get; } = new ObservableCollection<string>
+        {
+            "Easy",
+            "Moderate",
+            "Difficult",
+            "Extreme"
+        };
+
+        private TourViewModel tourViewModel;
+
+        public TourLogViewModel(TourViewModel tourViewModel)
+        {
+            this.tourViewModel = tourViewModel;
+            SaveTourLogCommand = new RelayCommand(SaveTourLog);
+            DeleteTourLogCommand = new RelayCommand(DeleteSelectedTourLog);
+            InitializeTourLogs();
+        }
+
+        private void InitializeTourLogs()
+        {
+            TourLogs = new ObservableCollection<TourLog>(TourLog.CreateExampleTourLogs());
+        }
+
+        private void UpdateTourLogs()
+        {
+            if (SelectedTour != null)
+            {
+                TourLogs = new ObservableCollection<TourLog>(SelectedTour.TourLogs);
+            }
             else
             {
-                Debug.WriteLine("Tour log not found for update.");
+                TourLogs?.Clear();
             }
+        }
+
+        private void SaveTourLog(object? parameter)
+        {
+            if (SelectedTour == null)
+            {
+                return;
+            }
+
+            if (SelectedTourLog == null)
+            {
+                // Add new TourLog
+                var newTourLog = new TourLog
+                {
+                    Date = SelectedDate,
+                    Comment = SelectedComment,
+                    Difficulty = SelectedDifficulty,
+                    TotalDistance = (int)SelectedTotalDistance,
+                    TotalTime = (int)SelectedTotalTime,
+                    Weather = SelectedWeather
+                };
+
+                SelectedTour.TourLogs.Add(newTourLog);
+            }
+            else
+            {
+                // Update existing TourLog
+                var tourLogToUpdate = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
+
+                if (tourLogToUpdate != null)
+                {
+                    tourLogToUpdate.Date = SelectedDate;
+                    tourLogToUpdate.Comment = SelectedComment;
+                    tourLogToUpdate.Difficulty = SelectedDifficulty;
+                    tourLogToUpdate.TotalDistance = (int)SelectedTotalDistance;
+                    tourLogToUpdate.TotalTime = (int)SelectedTotalTime;
+                    tourLogToUpdate.Weather = SelectedWeather;
+                }
+            }
+
+            OnPropertyChanged(nameof(TourLogs));
+
+            // Close the window after saving
+            if (parameter is Window window)
+            {
+                window.DialogResult = true;
+                window.Close();
+            }
+        }
+
+        public void DeleteSelectedTourLog(object? parameter)
+        {
+            if (SelectedTour == null || SelectedTourLog == null)
+            {
+                return;
+            }
+
+            var tourLogToDelete = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
+
+            if (tourLogToDelete != null)
+            {
+                SelectedTour.TourLogs.Remove(tourLogToDelete);
+                OnPropertyChanged(nameof(TourLogs));
+            }
+
+            SelectedTourLog = null;
+            OnPropertyChanged(nameof(SelectedTourLog));
+        }
+
+        private void LoadSelectedTourLogData()
+        {
+            SelectedDate = SelectedTourLog?.Date;
+            SelectedComment = SelectedTourLog?.Comment;
+            SelectedTotalDistance = SelectedTourLog?.TotalDistance ?? 0;
+            SelectedTotalTime = SelectedTourLog?.TotalTime ?? 0;
+            SelectedDifficulty = SelectedTourLog?.Difficulty;
+            SelectedWeather = SelectedTourLog?.Weather;
+        }
+
+        public void OpenTourLogWindow(object parameter)
+        {
+            if (SelectedTourLog == null)
+            {
+                // Create a new TourLog
+                SelectedTourLog = new TourLog();
+                LoadSelectedTourLogData();
+            }
+
+            var addTourLogWindow = new AddTourLogWindow(this);
+            addTourLogWindow.ShowDialog();
+
+            // Reset the SelectedTourLog after closing the window
+            SelectedTourLog = null;
+            LoadSelectedTourLogData();
         }
 
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public Tour? FindTourById(int id)
-        {
-            Debug.Assert(Tours != null, nameof(Tours) + " != null");
-            return Tours.FirstOrDefault(tour => tour.Id == id);
         }
     }
 }

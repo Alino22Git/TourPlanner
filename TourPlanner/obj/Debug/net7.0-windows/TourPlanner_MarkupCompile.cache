@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET7_0;NETCOREAPP
 C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\App.xaml
-51797990465
+51539019171
 
-121809376398
-198947991364
-AddTourLogWindow.xaml;AddTourWindow.xaml;MainWindow.xaml;UserMainMenu.xaml;UserSearchBar.xaml;
+112090750167
+2001322331344
+Views\AddTourLogWindow.xaml;Views\AddTourWindow.xaml;Views\MainWindow.xaml;Views\SubViews\UserMainMenu.xaml;Views\SubViews\UserSearchBar.xaml;
 
 False
 

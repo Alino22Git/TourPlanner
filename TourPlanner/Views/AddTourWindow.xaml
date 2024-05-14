@@ -1,0 +1,34 @@
+﻿<Window x:Class="TourPlanner.Views.AddTourWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tours" Height="400" Width="400"
+        Foreground="White" Background="#FF312929">
+    <StackPanel Margin="10">
+        <Label Content="Name:" Foreground="White"/>
+        <TextBox Text="{Binding SelectedTour.Name}" Margin="0,0,0,5"/>
+
+        <Label Content="From:" Foreground="White"/>
+        <TextBox Text="{Binding SelectedTour.From}" Margin="0,0,0,5"/>
+
+        <Label Content="To:" Foreground="White"/>
+        <TextBox Text="{Binding SelectedTour.To}" Margin="0,0,0,5"/>
+
+        <Label Content="Distance:" Foreground="White"/>
+        <TextBox Text="{Binding SelectedTour.Distance}" Margin="0,0,0,5"/>
+
+        <Label Content="Time:" Foreground="White"/>
+        <TextBox Text="{Binding SelectedTour.Time}" Margin="0,0,0,5"/>
+
+        <Label Content="Description:" Foreground="White"/>
+        <TextBox Text="{Binding SelectedTour.Description}" Margin="0,0,0,5"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Save" Command="{Binding SaveTourCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,20,5,0" Padding="15,0"/>
+            <!-- In AddTourWindow.xaml -->
+            <Button Content="Delete"
+                    Command="{Binding DeleteTourCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Margin="0,20,5,0" Padding="10,2"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

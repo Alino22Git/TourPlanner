@@ -12,6 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TourPlannerBusinessLayer\TourPlannerBusinessLayer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Images\test.png" />
   </ItemGroup>
 
