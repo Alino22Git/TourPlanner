@@ -6,7 +6,8 @@ using TourPlanner.ViewModels;
 using TourPlanner.Views;
 using TourPlannerDAL;
 using TourPlannerBusinessLayer.Services;
-using System.Windows.Controls;  // <- Diese Zeile hinzufügen
+using System.Windows.Controls;
+using TourPlanner.Viewmodels;
 
 namespace TourPlanner
 {
@@ -30,10 +31,12 @@ namespace TourPlanner
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<TourPlannerDbContext>(options =>
-                options.UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=root;Password=tourplanner"));
+                options.UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=root;Password=tourplanner"), ServiceLifetime.Scoped);
 
-            services.AddTransient<TourRepository>();
-            services.AddTransient<TourService>();
+            services.AddScoped<TourRepository>();
+            services.AddScoped<TourLogRepository>();
+            services.AddScoped<TourService>();
+            services.AddScoped<TourLogService>();
             services.AddTransient<MainViewModel>();
             services.AddTransient<TourViewModel>();
             services.AddTransient<TourLogViewModel>();
@@ -48,7 +51,8 @@ namespace TourPlanner
             {
                 var contentControl = new ContentControl();
                 var tourService = provider.GetRequiredService<TourService>();
-                return new MainViewModel(contentControl, tourService);
+                var tourLogService = provider.GetRequiredService<TourLogService>();
+                return new MainViewModel(contentControl, tourService, tourLogService);
             });
         }
     }

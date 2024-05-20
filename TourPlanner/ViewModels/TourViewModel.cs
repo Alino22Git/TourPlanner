@@ -54,15 +54,13 @@ namespace TourPlanner.ViewModels
             _tourService = tourService;
             LoadTours();
             SaveTourCommand = new RelayCommand(async (parameter) => await SaveTour(parameter));
-            DeleteTourCommand = new RelayCommand(DeleteSelectedTour);
+            DeleteTourCommand = new RelayCommand(async (parameter) => await DeleteSelectedTour(parameter));
         }
 
         private async void LoadTours()
         {
             var toursFromDb = await _tourService.GetToursAsync();
             Tours = new ObservableCollection<Tour>(toursFromDb);
-            var exampleTourLogs = TourLog.CreateExampleTourLogs();
-            Tours[0].TourLogs = new ObservableCollection<TourLog>(exampleTourLogs);
         }
 
         public void OpenTourWindow(Tour originalTour)
@@ -91,6 +89,7 @@ namespace TourPlanner.ViewModels
 
         public void CreateNewTour(object? parameter)
         {
+            // Ensure OriginalTour is null before opening the dialog
             OriginalTour = null;
             SelectedTour = new Tour();
             var addTourWindow = new AddTourWindow(this, SelectedTour);
@@ -99,32 +98,54 @@ namespace TourPlanner.ViewModels
 
         private async Task SaveTour(object? parameter)
         {
-            if (OriginalTour != null && SelectedTour != null)
+            if (SelectedTour != null)
             {
-                OriginalTour.Name = SelectedTour.Name;
-                OriginalTour.From = SelectedTour.From;
-                OriginalTour.To = SelectedTour.To;
-                OriginalTour.Distance = SelectedTour.Distance;
-                OriginalTour.Time = SelectedTour.Time;
-                OriginalTour.Description = SelectedTour.Description;
-
-                if (!Tours.Contains(OriginalTour))
+                // Falls OriginalTour null ist, handelt es sich um eine neue Tour
+                if (OriginalTour.Name == null)
                 {
-                    Tours.Add(OriginalTour);
-                }
+                    var newTour = new Tour
+                    {
+                        Name = SelectedTour.Name,
+                        From = SelectedTour.From,
+                        To = SelectedTour.To,
+                        Distance = SelectedTour.Distance,
+                        Time = SelectedTour.Time,
+                        Description = SelectedTour.Description,
+                        TourLogs = SelectedTour.TourLogs
+                    };
 
-                // Speichern in die Datenbank
-                await _tourService.AddTourAsync(OriginalTour);
+                    // Speichern in die Datenbank
+                    await _tourService.AddTourAsync(newTour);
+
+                    // Tour zur UI-Liste hinzufügen
+                    Tours.Add(newTour);
+                }
+                else
+                {
+                    // OriginalTour mit den Werten von SelectedTour aktualisieren
+                    OriginalTour.Name = SelectedTour.Name;
+                    OriginalTour.From = SelectedTour.From;
+                    OriginalTour.To = SelectedTour.To;
+                    OriginalTour.Distance = SelectedTour.Distance;
+                    OriginalTour.Time = SelectedTour.Time;
+                    OriginalTour.Description = SelectedTour.Description;
+
+                    // Tour in der Datenbank aktualisieren
+                    await _tourService.UpdateTourAsync(OriginalTour);
+                }
 
                 if (parameter is Window window)
                 {
                     window.DialogResult = true;
                     window.Close();
                 }
+
+                // UI aktualisieren
+                OnPropertyChanged(nameof(Tours));
             }
         }
 
-        private void DeleteSelectedTour(object? parameter)
+        private async Task DeleteSelectedTour(object? parameter)
         {
             if (SelectedTour != null && Tours != null)
             {
@@ -132,8 +153,7 @@ namespace TourPlanner.ViewModels
                 if (tourToDelete != null)
                 {
                     Tours.Remove(tourToDelete);
-                    // Löschen aus der Datenbank
-                    // await _tourService.DeleteTourAsync(tourToDelete); // Implementieren Sie diese Methode im TourService
+                    await _tourService.DeleteTourAsync(tourToDelete);
                 }
                 SelectedTour = null;
                 OnPropertyChanged(nameof(Tours));

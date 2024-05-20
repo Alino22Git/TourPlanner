@@ -111,7 +111,7 @@
                     <MenuItem Header="Misc"/>
                 </Menu>
 
-                <ContentControl Grid.Row="1" Margin="10" x:Name="DynamicContentControl"/>
+                <ContentControl Grid.Row="1" Margin="10" x:Name="DynamicContentControl" Content="{Binding DynamicContentControl}"/>
             </Grid>
         </Border>
 
@@ -149,8 +149,8 @@
                                     <ColumnDefinition Width="150"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='{}{0:MM/dd/yyyy}'}" Foreground="White" Margin="5"/>
-                                <TextBlock Grid.Column="1" Text="{Binding TotalTime, StringFormat='{}{0:0}'}" Foreground="White" Margin="5"/>
-                                <TextBlock Grid.Column="2" Text="{Binding TotalDistance}" Foreground="White" Margin="5"/>
+                                <TextBlock Grid.Column="1" Text="{Binding TotalTime, StringFormat=N2}" Foreground="White" Margin="5"/>
+                                <TextBlock Grid.Column="2" Text="{Binding TotalDistance, StringFormat=N2}" Foreground="White" Margin="5"/>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

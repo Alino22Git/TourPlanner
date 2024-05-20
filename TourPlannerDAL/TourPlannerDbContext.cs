@@ -17,7 +17,6 @@ namespace TourPlannerDAL
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configurations for Tour entity
             modelBuilder.Entity<Tour>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -29,17 +28,19 @@ namespace TourPlannerDAL
                 entity.Property(e => e.Description).HasMaxLength(500);
             });
 
-            // Configurations for TourLog entity
             modelBuilder.Entity<TourLog>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Date).IsRequired();
                 entity.Property(e => e.Comment).HasMaxLength(500);
                 entity.Property(e => e.Difficulty).HasMaxLength(50);
-                entity.Property(e => e.TotalDistance).IsRequired();
-                entity.Property(e => e.TotalTime).IsRequired();
+                entity.Property(e => e.TotalDistance).IsRequired().HasColumnType("double precision");
+                entity.Property(e => e.TotalTime).IsRequired().HasColumnType("double precision");
                 entity.Property(e => e.Rating).HasMaxLength(50);
                 entity.Property(e => e.Weather).HasMaxLength(50);
+                entity.HasOne(t => t.Tour)
+                    .WithMany(t => t.TourLogs)
+                    .HasForeignKey(t => t.TourId);
             });
         }
     }

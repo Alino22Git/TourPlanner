@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Models;
+using TourPlanner.Viewmodels;
 using TourPlanner.Views;
 using TourPlannerBusinessLayer.Services;
 
@@ -28,13 +29,22 @@ namespace TourPlanner.ViewModels
         public ICommand ListBoxSelectionChangedCommand { get; }
 
         private ContentControl _dynamicContentControl;
+        public ContentControl DynamicContentControl
+        {
+            get => _dynamicContentControl;
+            set
+            {
+                _dynamicContentControl = value;
+                OnPropertyChanged(nameof(DynamicContentControl));
+            }
+        }
 
-        public MainViewModel(ContentControl dynamicContentControl, TourService tourService)
+        public MainViewModel(ContentControl dynamicContentControl, TourService tourService, TourLogService tourLogService)
         {
             _dynamicContentControl = dynamicContentControl;
 
             TourViewModel = new TourViewModel(tourService);
-            TourLogViewModel = new TourLogViewModel(TourViewModel);
+            TourLogViewModel = new TourLogViewModel(TourViewModel, tourLogService);
             TourViewModel.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(TourViewModel.SelectedTour))
@@ -59,15 +69,15 @@ namespace TourPlanner.ViewModels
         {
             if (TourViewModel.SelectedTour != null)
             {
-                _dynamicContentControl.DataContext = TourViewModel;
-                _dynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
-                _dynamicContentControl.Content = TourViewModel.SelectedTour;
+                DynamicContentControl.DataContext = TourViewModel;
+                DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
+                DynamicContentControl.Content = TourViewModel.SelectedTour;
             }
         }
 
         private void SetRouteContent(object parameter)
         {
-            _dynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("RoutePlaceholderTemplate");
+            DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("RoutePlaceholderTemplate");
         }
 
         private void OpenAddTourWindow(object? parameter)
@@ -124,7 +134,7 @@ namespace TourPlanner.ViewModels
             {
                 TourViewModel.SelectedTour = selectedTour;
                 TourLogViewModel.TourLogs = selectedTour.TourLogs;
-                SetGeneralContent(null);
+                SetGeneralContent(selectedTour);
             }
         }
 

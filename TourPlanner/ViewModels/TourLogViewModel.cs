@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Models;
+using TourPlanner.ViewModels;
 using TourPlanner.Views;
+using TourPlannerBusinessLayer.Services;
 
-namespace TourPlanner.ViewModels
+namespace TourPlanner.Viewmodels
 {
     public class TourLogViewModel : INotifyPropertyChanged
     {
+        private readonly TourLogService _tourLogService;
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public ICommand SaveTourLogCommand { get; }
@@ -128,24 +132,26 @@ namespace TourPlanner.ViewModels
 
         private TourViewModel tourViewModel;
 
-        public TourLogViewModel(TourViewModel tourViewModel)
+        public TourLogViewModel(TourViewModel tourViewModel, TourLogService tourLogService)
         {
             this.tourViewModel = tourViewModel;
-            SaveTourLogCommand = new RelayCommand(SaveTourLog);
+            this._tourLogService = tourLogService;
+            SaveTourLogCommand = new RelayCommand(async (parameter) => await SaveTourLog(parameter));
             DeleteTourLogCommand = new RelayCommand(DeleteSelectedTourLog);
-            InitializeTourLogs();
+           // InitializeTourLogs();
         }
 
         private void InitializeTourLogs()
         {
-            TourLogs = new ObservableCollection<TourLog>(TourLog.CreateExampleTourLogs());
+            //TourLogs = new ObservableCollection<TourLog>(TourLog.CreateExampleTourLogs());
         }
 
-        private void UpdateTourLogs()
+        private async void UpdateTourLogs()
         {
             if (SelectedTour != null)
             {
-                TourLogs = new ObservableCollection<TourLog>(SelectedTour.TourLogs);
+                var logs = await _tourLogService.GetTourLogsByTourIdAsync(SelectedTour.Id);
+                TourLogs = new ObservableCollection<TourLog>(logs);
             }
             else
             {
@@ -153,7 +159,7 @@ namespace TourPlanner.ViewModels
             }
         }
 
-        private void SaveTourLog(object? parameter)
+        private async Task SaveTourLog(object? parameter)
         {
             if (SelectedTour == null)
             {
@@ -165,14 +171,16 @@ namespace TourPlanner.ViewModels
                 // Add new TourLog
                 var newTourLog = new TourLog
                 {
-                    Date = SelectedDate,
+                    Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null,
                     Comment = SelectedComment,
                     Difficulty = SelectedDifficulty,
-                    TotalDistance = (int)SelectedTotalDistance,
-                    TotalTime = (int)SelectedTotalTime,
-                    Weather = SelectedWeather
+                    TotalDistance = SelectedTotalDistance,
+                    TotalTime = SelectedTotalTime,
+                    Weather = SelectedWeather,
+                    TourId = SelectedTour.Id // Set the TourId for the new TourLog
                 };
 
+                await _tourLogService.AddTourLogAsync(newTourLog); // Save to database
                 SelectedTour.TourLogs.Add(newTourLog);
             }
             else
@@ -182,16 +190,17 @@ namespace TourPlanner.ViewModels
 
                 if (tourLogToUpdate != null)
                 {
-                    tourLogToUpdate.Date = SelectedDate;
+                    tourLogToUpdate.Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null;
                     tourLogToUpdate.Comment = SelectedComment;
                     tourLogToUpdate.Difficulty = SelectedDifficulty;
-                    tourLogToUpdate.TotalDistance = (int)SelectedTotalDistance;
-                    tourLogToUpdate.TotalTime = (int)SelectedTotalTime;
+                    tourLogToUpdate.TotalDistance = SelectedTotalDistance;
+                    tourLogToUpdate.TotalTime = SelectedTotalTime;
                     tourLogToUpdate.Weather = SelectedWeather;
+                    await _tourLogService.UpdateTourLogAsync(tourLogToUpdate); // Update in database
                 }
             }
 
-            OnPropertyChanged(nameof(TourLogs));
+            // Update the TourLogs list
 
             // Close the window after saving
             if (parameter is Window window)
@@ -199,6 +208,7 @@ namespace TourPlanner.ViewModels
                 window.DialogResult = true;
                 window.Close();
             }
+            UpdateTourLogs();
         }
 
         public void DeleteSelectedTourLog(object? parameter)
@@ -213,10 +223,11 @@ namespace TourPlanner.ViewModels
             if (tourLogToDelete != null)
             {
                 SelectedTour.TourLogs.Remove(tourLogToDelete);
+                _tourLogService.DeleteTourLogAsync(tourLogToDelete); // Delete from database
                 OnPropertyChanged(nameof(TourLogs));
             }
-
             SelectedTourLog = null;
+            UpdateTourLogs();
             OnPropertyChanged(nameof(SelectedTourLog));
         }
 
