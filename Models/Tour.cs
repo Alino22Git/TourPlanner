@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace TourPlannerBusinessLayer.Models;
+namespace Models;
 
 public class Tour : INotifyPropertyChanged
 {

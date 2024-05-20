@@ -1,15 +1,19 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Models;
 using TourPlanner.Views;
-using TourPlannerBusinessLayer.Models;
+using TourPlannerBusinessLayer.Services;
 
 namespace TourPlanner.ViewModels
 {
     public class TourViewModel : INotifyPropertyChanged
     {
+        private readonly TourService _tourService;
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public ICommand SaveTourCommand { get; }
@@ -45,22 +49,18 @@ namespace TourPlanner.ViewModels
 
         private Tour? OriginalTour { get; set; }
 
-        public TourViewModel()
+        public TourViewModel(TourService tourService)
         {
-            InitializeTours();
-            SaveTourCommand = new RelayCommand(SaveTour);
+            _tourService = tourService;
+            LoadTours();
+            SaveTourCommand = new RelayCommand(async (parameter) => await SaveTour(parameter));
             DeleteTourCommand = new RelayCommand(DeleteSelectedTour);
         }
 
-        private void InitializeTours()
+        private async void LoadTours()
         {
-            Tours = new ObservableCollection<Tour>
-            {
-                new Tour { Id = 1, Name = "Tour 1", From = "Location 1", To = "Location 1", Distance = "10 km", Time = "2", Description = "Description 1", TourLogs = new ObservableCollection<TourLog>() },
-                new Tour { Id = 2, Name = "Tour 2", From = "Location 2", To = "Location 1", Distance = "15 km", Time = "12", Description = "Description 2" },
-                new Tour { Id = 3, Name = "Tour 3", From = "Location 3", To = "Location 1", Distance = "20 km", Time = "4", Description = "Description 3" }
-            };
-
+            var toursFromDb = await _tourService.GetToursAsync();
+            Tours = new ObservableCollection<Tour>(toursFromDb);
             var exampleTourLogs = TourLog.CreateExampleTourLogs();
             Tours[0].TourLogs = new ObservableCollection<TourLog>(exampleTourLogs);
         }
@@ -97,7 +97,7 @@ namespace TourPlanner.ViewModels
             addTourWindow.ShowDialog();
         }
 
-        private void SaveTour(object? parameter)
+        private async Task SaveTour(object? parameter)
         {
             if (OriginalTour != null && SelectedTour != null)
             {
@@ -112,6 +112,9 @@ namespace TourPlanner.ViewModels
                 {
                     Tours.Add(OriginalTour);
                 }
+
+                // Speichern in die Datenbank
+                await _tourService.AddTourAsync(OriginalTour);
 
                 if (parameter is Window window)
                 {
@@ -129,6 +132,8 @@ namespace TourPlanner.ViewModels
                 if (tourToDelete != null)
                 {
                     Tours.Remove(tourToDelete);
+                    // Löschen aus der Datenbank
+                    // await _tourService.DeleteTourAsync(tourToDelete); // Implementieren Sie diese Methode im TourService
                 }
                 SelectedTour = null;
                 OnPropertyChanged(nameof(Tours));

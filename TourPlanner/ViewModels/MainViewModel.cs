@@ -4,8 +4,9 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Models;
 using TourPlanner.Views;
-using TourPlannerBusinessLayer.Models;
+using TourPlannerBusinessLayer.Services;
 
 namespace TourPlanner.ViewModels
 {
@@ -28,11 +29,11 @@ namespace TourPlanner.ViewModels
 
         private ContentControl _dynamicContentControl;
 
-        public MainViewModel(ContentControl dynamicContentControl)
+        public MainViewModel(ContentControl dynamicContentControl, TourService tourService)
         {
             _dynamicContentControl = dynamicContentControl;
 
-            TourViewModel = new TourViewModel();
+            TourViewModel = new TourViewModel(tourService);
             TourLogViewModel = new TourLogViewModel(TourViewModel);
             TourViewModel.PropertyChanged += (s, e) =>
             {

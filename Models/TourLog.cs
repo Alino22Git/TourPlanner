@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace TourPlannerBusinessLayer.Models
+namespace Models
 {
     public class TourLog : INotifyPropertyChanged
     {

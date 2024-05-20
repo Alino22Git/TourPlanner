@@ -5,8 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Models;
 using TourPlanner.Views;
-using TourPlannerBusinessLayer.Models;
 
 namespace TourPlanner.ViewModels
 {

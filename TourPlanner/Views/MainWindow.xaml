@@ -8,7 +8,9 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="Tour Planner" Height="600" Width="800"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}" Foreground="White" Style="{DynamicResource MyStyle}">
+        Style="{StaticResource MyStyle}"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}" 
+        Foreground="White">
 
     <Window.Resources>
         <DataTemplate x:Key="TourDetailsTemplate">

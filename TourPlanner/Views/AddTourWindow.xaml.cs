@@ -1,6 +1,6 @@
 ﻿using System.Windows;
+using Models;
 using TourPlanner.ViewModels;
-using TourPlannerBusinessLayer.Models;
 
 namespace TourPlanner.Views
 {
