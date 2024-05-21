@@ -246,6 +246,11 @@ namespace TourPlanner.Viewmodels
             SelectedTourLog = null;
             UpdateTourLogs();
             OnPropertyChanged(nameof(SelectedTourLog));
+            if (parameter is Window window)
+            {
+                window.DialogResult = true;
+                window.Close();
+            }
         }
 
         private void LoadSelectedTourLogData(){
@@ -258,18 +263,6 @@ namespace TourPlanner.Viewmodels
             foreach (var option in WeatherOptions){
                 option.IsChecked = SelectedTourLog?.Weather?.Split(',').Contains(option.Name.Trim()) ?? false;
             }
-        }
-
-        public void OpenTourLogWindow(object parameter){
-            if (SelectedTourLog == null){
-                
-                SelectedTourLog = new TourLog();
-                LoadSelectedTourLogData();
-            }
-            var addTourLogWindow = new AddTourLogWindow(this);
-            addTourLogWindow.ShowDialog();
-            SelectedTourLog = null;
-            LoadSelectedTourLogData();
         }
 
         protected void OnPropertyChanged(string propertyName){
