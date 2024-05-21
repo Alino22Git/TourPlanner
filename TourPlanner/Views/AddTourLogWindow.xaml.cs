@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using TourPlanner.Viewmodels;
 using TourPlanner.ViewModels;
 
 namespace TourPlanner.Views
@@ -9,11 +10,6 @@ namespace TourPlanner.Views
         {
             InitializeComponent();
             DataContext = viewModel;
-        }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
         }
     }
 }

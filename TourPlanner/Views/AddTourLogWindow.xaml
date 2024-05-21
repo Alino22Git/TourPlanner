@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TourPlanner"
         mc:Ignorable="d"
-        Title="Tour Log" Height="620" Width="400"
+        Title="Tour Log" Height="550" Width="400"
         DataContext="{Binding RelativeSource={RelativeSource Self}}" Foreground="White" Style="{DynamicResource MyStyle}">
 
     <StackPanel Margin="10">
@@ -17,18 +17,31 @@
 
         <Label Content="Difficulty:" Foreground="White"/>
         <ComboBox ItemsSource="{Binding DifficultyOptions}" SelectedItem="{Binding SelectedDifficulty}" />
+        
+        <Label Content="Rating:" Foreground="White"/>
+        <ComboBox ItemsSource="{Binding RatingOptions}" SelectedItem="{Binding SelectedRating}" />
+
+        <Label Content="Weather:" Foreground="White"/>
+        <ItemsControl ItemsSource="{Binding WeatherOptions}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Name}" Foreground="White"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <Label Content="Total Distance:" Foreground="White"/>
         <Slider Minimum="0" Maximum="500" Value="{Binding SelectedTotalDistance}" Margin="0,0,0,5"/>
-        <TextBlock Foreground="White" Text="{Binding SelectedTotalDistance, StringFormat={}{0:0}}"/>
+        <TextBlock Foreground="White" Text="{Binding SelectedTotalDistance, StringFormat=N2}"/>
 
         <Label Content="Total Time:" Foreground="White"/>
-        <Slider Minimum="0" Maximum="72" Value="{Binding SelectedTotalTime}" Margin="0,0,0,5"/>
-        <TextBlock Foreground="White" Text="{Binding SelectedTotalTime, StringFormat={}{0:0}}"/>
+        <Slider Minimum="0" Maximum="500" Value="{Binding SelectedTotalTime}" Margin="0,0,0,5"/>
+        <TextBlock Foreground="White" Text="{Binding SelectedTotalTime, StringFormat=N2}"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Save" Command="{Binding SaveTourLogCommand}" Margin="0,20,5,0" Padding="15,0"/>
-            <Button Content="Update" Command="{Binding UpdateTourLogCommand}" Margin="0,20,5,0" Padding="15,0"/>
+            <Button Content="Save" Command="{Binding SaveTourLogCommand}" Margin="0,20,5,0" Padding="15,0" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
             <Button Content="Delete" Command="{Binding DeleteTourLogCommand}" Margin="0,20,5,0" Padding="10,2"/>
         </StackPanel>
     </StackPanel>

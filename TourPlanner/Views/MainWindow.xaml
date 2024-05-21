@@ -3,12 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:local="clr-namespace:TourPlanner"
         xmlns:subViews="clr-namespace:TourPlanner.Views.SubViews"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="Tour Planner" Height="600" Width="800"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}" Foreground="White" Style="{DynamicResource MyStyle}">
+        Style="{StaticResource MyStyle}"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}" 
+        Foreground="White">
 
     <Window.Resources>
         <DataTemplate x:Key="TourDetailsTemplate">
@@ -108,8 +111,10 @@
                     <MenuItem Header="Route" Command="{Binding SetRouteContentCommand}"/>
                     <MenuItem Header="Misc"/>
                 </Menu>
-
-                <ContentControl Grid.Row="1" Margin="10" x:Name="DynamicContentControl"/>
+                <Grid>
+                    <wpf:WebView2 x:Name="webView" Source="about:blank" Margin="0,0,0,-230" />
+                </Grid>
+                <ContentControl Grid.Row="1" Margin="10" x:Name="DynamicContentControl" Content="{Binding DynamicContentControl}"/>
             </Grid>
         </Border>
 
@@ -147,8 +152,8 @@
                                     <ColumnDefinition Width="150"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='{}{0:MM/dd/yyyy}'}" Foreground="White" Margin="5"/>
-                                <TextBlock Grid.Column="1" Text="{Binding TotalTime, StringFormat='{}{0:0}'}" Foreground="White" Margin="5"/>
-                                <TextBlock Grid.Column="2" Text="{Binding TotalDistance}" Foreground="White" Margin="5"/>
+                                <TextBlock Grid.Column="1" Text="{Binding TotalTime, StringFormat=N2}" Foreground="White" Margin="5"/>
+                                <TextBlock Grid.Column="2" Text="{Binding TotalDistance, StringFormat=N2}" Foreground="White" Margin="5"/>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

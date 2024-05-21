@@ -5,13 +5,16 @@ namespace TourPlanner.Views
 {
     public partial class MainWindow : Window
     {
-        private readonly MainViewModel mainViewModel;
-
-        public MainWindow()
+        public MainWindow(MainViewModel mainViewModel)
         {
             InitializeComponent();
-            mainViewModel = new MainViewModel(DynamicContentControl);
             DataContext = mainViewModel;
+
+            // Initialize WebView via ViewModel Command
+            if (mainViewModel.InitializeWebViewCommand.CanExecute(webView))
+            {
+                mainViewModel.InitializeWebViewCommand.Execute(webView);
+            }
         }
     }
 }

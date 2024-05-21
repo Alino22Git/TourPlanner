@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace TourPlannerBusinessLayer.Models;
+namespace Models;
 
 public class Tour : INotifyPropertyChanged
 {
@@ -123,6 +123,21 @@ public class Tour : INotifyPropertyChanged
             {
                 description = value;
                 OnPropertyChanged(nameof(Description));
+            }
+        }
+    }
+
+    private string transportType;
+
+    public string TransportType
+    {
+        get => transportType;
+        set
+        {
+            if (transportType != value)
+            {
+                transportType = value;
+                OnPropertyChanged(nameof(TransportType));
             }
         }
     }
