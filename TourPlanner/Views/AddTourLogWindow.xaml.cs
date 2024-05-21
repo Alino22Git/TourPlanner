@@ -11,10 +11,5 @@ namespace TourPlanner.Views
             InitializeComponent();
             DataContext = viewModel;
         }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
     }
 }

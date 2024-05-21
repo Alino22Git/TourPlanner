@@ -126,6 +126,21 @@ public class Tour : INotifyPropertyChanged
             }
         }
     }
+
+    private string transportType;
+
+    public string TransportType
+    {
+        get => transportType;
+        set
+        {
+            if (transportType != value)
+            {
+                transportType = value;
+                OnPropertyChanged(nameof(TransportType));
+            }
+        }
+    }
    
     protected void OnPropertyChanged(string propertyName)
     {

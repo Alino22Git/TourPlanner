@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Models;
 using TourPlannerDAL;
@@ -18,15 +17,14 @@ namespace TourPlannerBusinessLayer.Services
 
         public async Task AddTourAsync(Tour tour)
         {
+            ValidateTour(tour);
+
             using (var scope = _serviceProvider.CreateScope())
             {
                 var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
                 await tourRepository.AddTourAsync(tour);
-
-                // Hier sicherstellen, dass die Tour-ID aktualisiert wird
             }
         }
-
 
         public async Task<List<Tour>> GetToursAsync()
         {
@@ -59,18 +57,35 @@ namespace TourPlannerBusinessLayer.Services
         {
             using (var scope = _serviceProvider.CreateScope())
             {
+                var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
                 var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
+
+                // Löschen aller zugehörigen TourLogs
+                //await tourLogRepository.DeleteTourLogsByTourIdAsync(tour.Id);
+
+                // Löschen der Tour
                 await tourRepository.DeleteTourAsync(tour);
             }
         }
 
         public async Task UpdateTourAsync(Tour tour)
         {
+            ValidateTour(tour);
+
             using (var scope = _serviceProvider.CreateScope())
             {
                 var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
                 await tourRepository.UpdateTourAsync(tour);
             }
+        }
+
+        private void ValidateTour(Tour tour)
+        {
+            if (string.IsNullOrEmpty(tour.Name))
+                throw new ArgumentException("Tour Name cannot be empty");
+
+            if (string.IsNullOrEmpty(tour.TransportType))
+                throw new ArgumentException("Transport Type cannot be empty");
         }
     }
 }

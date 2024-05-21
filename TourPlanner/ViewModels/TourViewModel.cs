@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,6 +48,14 @@ namespace TourPlanner.ViewModels
             }
         }
 
+        public ObservableCollection<string> TransportTypeOptions { get; } = new ObservableCollection<string>
+        {
+            "Hike",
+            "Bicycle",
+            "Car",
+            "Motorcycle"
+        };
+
         private Tour? OriginalTour { get; set; }
 
         public TourViewModel(TourService tourService)
@@ -82,6 +91,7 @@ namespace TourPlanner.ViewModels
                 Distance = originalTour.Distance,
                 Time = originalTour.Time,
                 Description = originalTour.Description,
+                TransportType = originalTour.TransportType,
                 TourLogs = new ObservableCollection<TourLog>(originalTour.TourLogs)
             };
             OnPropertyChanged(nameof(SelectedTour));
@@ -100,48 +110,44 @@ namespace TourPlanner.ViewModels
         {
             if (SelectedTour != null)
             {
-                // Falls OriginalTour null ist, handelt es sich um eine neue Tour
-                if (OriginalTour.Name == null)
+                try
                 {
-                    var newTour = new Tour
+                    // Falls OriginalTour null ist, handelt es sich um eine neue Tour
+                    if (OriginalTour == null)
                     {
-                        Name = SelectedTour.Name,
-                        From = SelectedTour.From,
-                        To = SelectedTour.To,
-                        Distance = SelectedTour.Distance,
-                        Time = SelectedTour.Time,
-                        Description = SelectedTour.Description,
-                        TourLogs = SelectedTour.TourLogs
-                    };
+                        await _tourService.AddTourAsync(SelectedTour);
 
-                    // Speichern in die Datenbank
-                    await _tourService.AddTourAsync(newTour);
+                        // Tour zur UI-Liste hinzufügen
+                        Tours.Add(SelectedTour);
+                    }
+                    else
+                    {
+                        // OriginalTour mit den Werten von SelectedTour aktualisieren
+                        OriginalTour.Name = SelectedTour.Name;
+                        OriginalTour.From = SelectedTour.From;
+                        OriginalTour.To = SelectedTour.To;
+                        OriginalTour.Distance = SelectedTour.Distance;
+                        OriginalTour.Time = SelectedTour.Time;
+                        OriginalTour.Description = SelectedTour.Description;
+                        OriginalTour.TransportType = SelectedTour.TransportType;
 
-                    // Tour zur UI-Liste hinzufügen
-                    Tours.Add(newTour);
+                        // Tour in der Datenbank aktualisieren
+                        await _tourService.UpdateTourAsync(OriginalTour);
+                    }
+
+                    // UI aktualisieren
+                    LoadTours();
+
+                    if (parameter is Window window)
+                    {
+                        window.DialogResult = true;
+                        window.Close();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    // OriginalTour mit den Werten von SelectedTour aktualisieren
-                    OriginalTour.Name = SelectedTour.Name;
-                    OriginalTour.From = SelectedTour.From;
-                    OriginalTour.To = SelectedTour.To;
-                    OriginalTour.Distance = SelectedTour.Distance;
-                    OriginalTour.Time = SelectedTour.Time;
-                    OriginalTour.Description = SelectedTour.Description;
-
-                    // Tour in der Datenbank aktualisieren
-                    await _tourService.UpdateTourAsync(OriginalTour);
+                    MessageBox.Show($"Error saving tour: {ex.Message}");
                 }
-
-                if (parameter is Window window)
-                {
-                    window.DialogResult = true;
-                    window.Close();
-                }
-
-                // UI aktualisieren
-                OnPropertyChanged(nameof(Tours));
             }
         }
 
