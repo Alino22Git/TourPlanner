@@ -27,7 +27,6 @@ namespace TourPlannerBusinessLayer.Service
                     return (longitude, latitude);
                 }
                 catch (Exception ex){
-                    // Fehlerbehandlung
                     Console.WriteLine($"Error fetching geocode data: {ex.Message}");
                     return (0, 0);
                 }

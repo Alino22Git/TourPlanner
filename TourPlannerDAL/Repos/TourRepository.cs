@@ -17,8 +17,6 @@ namespace TourPlannerDAL
         public async Task AddTourAsync(Tour tour){
             _dbContext.Tours.Add(tour);
             await _dbContext.SaveChangesAsync();
-
-            // Hier sicherstellen, dass die Tour-ID aktualisiert wird
             await _dbContext.Entry(tour).GetDatabaseValuesAsync();
         }
 
@@ -29,11 +27,8 @@ namespace TourPlannerDAL
         }
 
         public async Task DeleteTourAsync(Tour tour){
-            // Lösche alle zugehörigen TourLogs
             var tourLogs = await _dbContext.TourLogs.Where(tl => tl.TourId == tour.Id).ToListAsync();
             _dbContext.TourLogs.RemoveRange(tourLogs);
-
-            // Lösche die Tour
             _dbContext.Tours.Remove(tour);
             await _dbContext.SaveChangesAsync();
         }

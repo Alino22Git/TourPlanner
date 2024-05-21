@@ -26,7 +26,6 @@ namespace TourPlannerBusinessLayer.Service
                 return result;
             }
             catch (Exception ex){
-                // Fehlerbehandlung
                 Debug.WriteLine($"Error fetching directions data: {ex.Message}");
                 return null;
             }
