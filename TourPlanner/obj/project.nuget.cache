@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "hB1OHgmhfvsnitFSLxGDnVZ2zRA5McDjiV/P8ulTIcjIGEy3IXWhlYAbnGnBw6V5fh35Brq8ZyfQQBZIb/bgtg==",
+  "dgSpecHash": "m4W98CpQYksDqncokXuYd6Bmdn0b5LdeejJhag9JY/6Yc/PFNT40du4dqbL6Waa/UJt4uIx03Wh6wBgohBx26A==",
   "success": true,
   "projectFilePath": "C:\\Users\\micha\\Desktop\\Studium\\SEM-4\\SWEN\\TourPlanner\\TourPlanner\\TourPlanner.csproj",
   "expectedPackageFiles": [
@@ -21,6 +21,7 @@
     "C:\\Users\\micha\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\7.0.0\\microsoft.extensions.logging.abstractions.7.0.0.nupkg.sha512",
     "C:\\Users\\micha\\.nuget\\packages\\microsoft.extensions.options\\7.0.0\\microsoft.extensions.options.7.0.0.nupkg.sha512",
     "C:\\Users\\micha\\.nuget\\packages\\microsoft.extensions.primitives\\7.0.0\\microsoft.extensions.primitives.7.0.0.nupkg.sha512",
+    "C:\\Users\\micha\\.nuget\\packages\\microsoft.web.webview2\\1.0.2478.35\\microsoft.web.webview2.1.0.2478.35.nupkg.sha512",
     "C:\\Users\\micha\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.77\\microsoft.xaml.behaviors.wpf.1.1.77.nupkg.sha512",
     "C:\\Users\\micha\\.nuget\\packages\\mono.texttemplating\\2.2.1\\mono.texttemplating.2.2.1.nupkg.sha512",
     "C:\\Users\\micha\\.nuget\\packages\\npgsql\\7.0.2\\npgsql.7.0.2.nupkg.sha512",

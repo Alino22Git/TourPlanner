@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:local="clr-namespace:TourPlanner"
         xmlns:subViews="clr-namespace:TourPlanner.Views.SubViews"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -110,7 +111,9 @@
                     <MenuItem Header="Route" Command="{Binding SetRouteContentCommand}"/>
                     <MenuItem Header="Misc"/>
                 </Menu>
-
+                <Grid>
+                    <wpf:WebView2 x:Name="webView" Source="about:blank" Margin="0,100,0,-230" />
+                </Grid>
                 <ContentControl Grid.Row="1" Margin="10" x:Name="DynamicContentControl" Content="{Binding DynamicContentControl}"/>
             </Grid>
         </Border>

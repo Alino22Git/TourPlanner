@@ -158,3 +158,10 @@ C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7
 C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\Microsoft.EntityFrameworkCore.Design.dll
 C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\Microsoft.Extensions.DependencyModel.dll
 C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\Mono.TextTemplating.dll
+C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\runtimes\win-x86\native\WebView2Loader.dll
+C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\runtimes\win-x64\native\WebView2Loader.dll
+C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\runtimes\win-arm64\native\WebView2Loader.dll
+C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\Microsoft.Web.WebView2.Core.dll
+C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\Microsoft.Web.WebView2.WinForms.dll
+C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\bin\Debug\net7.0-windows\Microsoft.Web.WebView2.Wpf.dll
+C:\Users\micha\Desktop\Studium\SEM-4\SWEN\TourPlanner\TourPlanner\obj\Debug\net7.0-windows\TourPlanner_Content.g.cs
