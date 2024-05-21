@@ -75,7 +75,6 @@ namespace TourPlanner.ViewModels
             SetGeneralContentCommand = new RelayCommand(SetGeneralContent);
             SetRouteContentCommand = new RelayCommand(SetRouteContent);
             InitializeWebViewCommand = new RelayCommand(async (parameter) => await InitializeWebViewAsync(parameter as WebView2));
-
             ListBoxItemDoubleClickCommand = new RelayCommand(ListBoxItemDoubleClick);
             TourLogMenuItemDoubleClickCommand = new RelayCommand(TourLogMenuItemDoubleClick);
             ListBoxSelectionChangedCommand = new RelayCommand(ListBoxSelectionChanged);
@@ -128,11 +127,20 @@ namespace TourPlanner.ViewModels
                 DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
                 DynamicContentControl.Content = TourViewModel.SelectedTour;
             }
+
+            if (_webView != null)
+            {
+                _webView.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void SetRouteContent(object parameter)
+        
         {
-            DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("RoutePlaceholderTemplate");
+            if (_webView != null)
+            {
+                _webView.Visibility = Visibility.Visible;
+            }
         }
 
         private void OpenAddTourWindow(object? parameter)

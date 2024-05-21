@@ -11,9 +11,11 @@ namespace TourPlanner.Views
             DataContext = mainViewModel;
 
             // Initialize WebView via ViewModel Command
+            
             if (mainViewModel.InitializeWebViewCommand.CanExecute(webView))
             {
                 mainViewModel.InitializeWebViewCommand.Execute(webView);
+                webView.Visibility = Visibility.Collapsed;
             }
         }
     }
