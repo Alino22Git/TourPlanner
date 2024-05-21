@@ -6,8 +6,7 @@ namespace TourPlannerDAL
 {
     public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<TourPlannerDbContext>
     {
-        public TourPlannerDbContext CreateDbContext(string[] args)
-        {
+        public TourPlannerDbContext CreateDbContext(string[] args){
             var optionsBuilder = new DbContextOptionsBuilder<TourPlannerDbContext>();
             var connectionString = "Host=localhost;Port=5432;Database=postgres;Username=root;Password=tourplanner";
             optionsBuilder.UseNpgsql(connectionString);

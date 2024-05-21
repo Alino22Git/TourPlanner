@@ -14,8 +14,7 @@ namespace TourPlannerDAL
             _dbContext = dbContext;
         }
 
-        public async Task AddTourAsync(Tour tour)
-        {
+        public async Task AddTourAsync(Tour tour){
             _dbContext.Tours.Add(tour);
             await _dbContext.SaveChangesAsync();
 
@@ -24,14 +23,12 @@ namespace TourPlannerDAL
         }
 
 
-        public async Task UpdateTourAsync(Tour tour)
-        {
+        public async Task UpdateTourAsync(Tour tour){
             _dbContext.Tours.Update(tour);
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteTourAsync(Tour tour)
-        {
+        public async Task DeleteTourAsync(Tour tour){
             // Lösche alle zugehörigen TourLogs
             var tourLogs = await _dbContext.TourLogs.Where(tl => tl.TourId == tour.Id).ToListAsync();
             _dbContext.TourLogs.RemoveRange(tourLogs);
@@ -41,8 +38,7 @@ namespace TourPlannerDAL
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<List<Tour>> GetToursAsync()
-        {
+        public async Task<List<Tour>> GetToursAsync(){
             return await _dbContext.Tours.Include(t => t.TourLogs).ToListAsync();
         }
     }

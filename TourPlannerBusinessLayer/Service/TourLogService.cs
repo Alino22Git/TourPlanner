@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Models;
 using TourPlannerDAL;
 
-namespace TourPlannerBusinessLayer.Services
+namespace TourPlannerBusinessLayer.Service
 {
     public class TourLogService
     {
@@ -15,8 +13,7 @@ namespace TourPlannerBusinessLayer.Services
             _serviceProvider = serviceProvider;
         }
 
-        public async Task AddTourLogAsync(TourLog tourLog)
-        {
+        public async Task AddTourLogAsync(TourLog tourLog){
             using (var scope = _serviceProvider.CreateScope())
             {
                 var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
@@ -24,8 +21,7 @@ namespace TourPlannerBusinessLayer.Services
             }
         }
 
-        public async Task<List<TourLog>> GetTourLogsByTourIdAsync(int tourId)
-        {
+        public async Task<List<TourLog>> GetTourLogsByTourIdAsync(int tourId){
             using (var scope = _serviceProvider.CreateScope())
             {
                 var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
@@ -33,8 +29,7 @@ namespace TourPlannerBusinessLayer.Services
             }
         }
 
-        public async Task UpdateTourLogAsync(TourLog tourLogToUpdate)
-        {
+        public async Task UpdateTourLogAsync(TourLog tourLogToUpdate){
             using (var scope = _serviceProvider.CreateScope())
             {
                 var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
@@ -42,8 +37,7 @@ namespace TourPlannerBusinessLayer.Services
             }
         }
 
-        public async Task DeleteTourLogAsync(TourLog tourLog)
-        {
+        public async Task DeleteTourLogAsync(TourLog tourLog){
             using (var scope = _serviceProvider.CreateScope())
             {
                 var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
