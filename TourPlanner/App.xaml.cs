@@ -8,6 +8,7 @@ using TourPlannerDAL;
 using TourPlannerBusinessLayer.Services;
 using System.Windows.Controls;
 using TourPlanner.Viewmodels;
+using TourPlanner.Services;
 
 namespace TourPlanner
 {
@@ -33,6 +34,9 @@ namespace TourPlanner
             services.AddDbContext<TourPlannerDbContext>(options =>
                 options.UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=root;Password=tourplanner"), ServiceLifetime.Scoped);
 
+            services.AddHttpClient<GeocodeService>();
+            services.AddHttpClient<DirectionService>();
+
             services.AddScoped<TourRepository>();
             services.AddScoped<TourLogRepository>();
             services.AddScoped<TourService>();
@@ -52,7 +56,9 @@ namespace TourPlanner
                 var contentControl = new ContentControl();
                 var tourService = provider.GetRequiredService<TourService>();
                 var tourLogService = provider.GetRequiredService<TourLogService>();
-                return new MainViewModel(contentControl, tourService, tourLogService);
+                var geocodeService = provider.GetRequiredService<GeocodeService>();
+                var directionService = provider.GetRequiredService<DirectionService>();
+                return new MainViewModel(contentControl, tourService, tourLogService, geocodeService, directionService);
             });
         }
     }
