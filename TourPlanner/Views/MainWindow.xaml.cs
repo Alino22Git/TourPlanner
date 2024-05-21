@@ -10,8 +10,6 @@ namespace TourPlanner.Views
             InitializeComponent();
             DataContext = mainViewModel;
 
-            // Initialize WebView via ViewModel Command
-            
             if (mainViewModel.InitializeWebViewCommand.CanExecute(webView))
             {
                 mainViewModel.InitializeWebViewCommand.Execute(webView);

@@ -6,8 +6,7 @@ namespace TourPlanner.Views
 {
     public partial class AddTourLogWindow : Window
     {
-        public AddTourLogWindow(TourLogViewModel viewModel)
-        {
+        public AddTourLogWindow(TourLogViewModel viewModel){
             InitializeComponent();
             DataContext = viewModel;
         }

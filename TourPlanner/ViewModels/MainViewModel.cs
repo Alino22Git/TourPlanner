@@ -9,19 +9,17 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Web.WebView2.Wpf;
 using Models;
-using TourPlanner.Services;
 using TourPlanner.Viewmodels;
 using TourPlanner.Views;
-using TourPlannerBusinessLayer.Services;
+using TourPlannerBusinessLayer.Managers;
+using TourPlannerBusinessLayer.Service;
 
 namespace TourPlanner.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
-    {
+    public class MainViewModel : INotifyPropertyChanged{
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        private readonly GeocodeService _geocodeService;
-        private readonly DirectionService _directionService;
+        private readonly RouteDataManager _routeDataManager;
 
         public TourViewModel TourViewModel { get; }
         public TourLogViewModel TourLogViewModel { get; }
@@ -39,7 +37,7 @@ namespace TourPlanner.ViewModels
 
         private ContentControl _dynamicContentControl;
         private WebView2 _webView;
-
+        private bool hideWebView = true;
         public ContentControl DynamicContentControl
         {
             get => _dynamicContentControl;
@@ -50,14 +48,12 @@ namespace TourPlanner.ViewModels
             }
         }
 
-        public MainViewModel(ContentControl dynamicContentControl, TourService tourService, TourLogService tourLogService, GeocodeService geocodeService, DirectionService directionService)
-        {
+        public MainViewModel(ContentControl dynamicContentControl, TourService tourService, TourLogService tourLogService, GeocodeService geocodeService, DirectionService directionService){
             _dynamicContentControl = dynamicContentControl;
 
             TourViewModel = new TourViewModel(tourService);
             TourLogViewModel = new TourLogViewModel(TourViewModel, tourLogService);
-            _geocodeService = geocodeService;
-            _directionService = directionService;
+            _routeDataManager = new RouteDataManager(geocodeService, directionService);
 
             TourViewModel.PropertyChanged += async (s, e) =>
             {
@@ -84,30 +80,21 @@ namespace TourPlanner.ViewModels
         {
             if (webView != null)
             {
-                _webView = webView; // Speichern Sie die WebView-Referenz für spätere Updates
+                _webView = webView;
                 await webView.EnsureCoreWebView2Async(null);
                 await UpdateWebViewAsync();
             }
         }
 
-        private async Task UpdateWebViewAsync()
-        {
-            if (_webView != null && TourViewModel.SelectedTour != null)
+        private async Task UpdateWebViewAsync(){
+            if (_webView != null && TourViewModel.SelectedTour != null && TourLogViewModel.SelectedTour.From != null)
             {
-                var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(TourViewModel.SelectedTour.From);
-                var (endLongitude, endLatitude) = await _geocodeService.GetCoordinatesAsync(TourViewModel.SelectedTour.To);
+                var (startLongitude, startLatitude, endLongitude, endLatitude, directions) = await _routeDataManager.GetTourDataAsync(TourViewModel.SelectedTour.From, TourViewModel.SelectedTour.To);
 
-                string directions = await _directionService.GetDirectionsAsync(startLongitude, startLatitude, endLongitude, endLatitude);
+                string filePath = _routeDataManager.GetProjectResourcePath("directions.js");
+                await _routeDataManager.SaveDirectionsToFileAsync(directions, filePath);
 
-                string jsContent = $"const directions = {directions};";
-
-                string projectDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
-                string resourceDir = Path.Combine(projectDir, "Resources");
-                Directory.CreateDirectory(resourceDir); // Sicherstellen, dass das Verzeichnis existiert
-                string filePath = Path.Combine(resourceDir, "directions.js");
-                await File.WriteAllTextAsync(filePath, jsContent);
-
-                string htmlPath = Path.Combine(resourceDir, "leaflet.html");
+                string htmlPath = _routeDataManager.GetProjectResourcePath("leaflet.html");
                 if (File.Exists(htmlPath))
                 {
                     _webView.CoreWebView2.Navigate(htmlPath);
@@ -119,55 +106,60 @@ namespace TourPlanner.ViewModels
             }
         }
 
-        private void SetGeneralContent(object parameter)
-        {
-            if (TourViewModel.SelectedTour != null)
-            {
+        private void SetGeneralContent(object parameter){
+            hideWebView = true;
+            if (TourViewModel.SelectedTour != null){
                 DynamicContentControl.DataContext = TourViewModel;
                 DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
                 DynamicContentControl.Content = TourViewModel.SelectedTour;
             }
 
-            if (_webView != null)
-            {
+            if (_webView != null && hideWebView){
+                _webView.Visibility = Visibility.Collapsed;
+            }
+        }
+
+
+        private void SetGeneralContentOnListChange(object parameter)
+        {
+            if (TourViewModel.SelectedTour != null){
+                DynamicContentControl.DataContext = TourViewModel;
+                DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
+                DynamicContentControl.Content = TourViewModel.SelectedTour;
+            }
+
+            if (_webView != null && hideWebView){
                 _webView.Visibility = Visibility.Collapsed;
             }
         }
 
         private void SetRouteContent(object parameter)
-        
         {
-            if (_webView != null)
-            {
+            if (_webView != null){
                 _webView.Visibility = Visibility.Visible;
             }
+            hideWebView = false;
         }
 
-        private void OpenAddTourWindow(object? parameter)
-        {
+        private void OpenAddTourWindow(object? parameter){
             TourViewModel.CreateNewTour(parameter);
         }
 
-        private void OpenAddTourLogWindow(object? parameter)
-        {
+        private void OpenAddTourLogWindow(object? parameter){
             var addTourLogWindow = new AddTourLogWindow(TourLogViewModel);
             addTourLogWindow.ShowDialog();
         }
 
-        private void ListBoxItemDoubleClick(object parameter)
-        {
+        private void ListBoxItemDoubleClick(object parameter){
             Debug.WriteLine("ListBoxItemDoubleClick called");
-            if (parameter == null)
-            {
+            if (parameter == null){
                 Debug.WriteLine("Parameter is null");
             }
-            else
-            {
+            else{
                 Debug.WriteLine($"Parameter type: {parameter.GetType()}");
             }
 
-            if (parameter is Tour selectedTour)
-            {
+            if (parameter is Tour selectedTour){
                 Debug.WriteLine("Parameter is Tour");
                 var addTourWindow = new AddTourWindow(TourViewModel, selectedTour);
                 bool? result = addTourWindow.ShowDialog();
@@ -176,16 +168,14 @@ namespace TourPlanner.ViewModels
                     TourViewModel.OnPropertyChanged(nameof(TourViewModel.Tours));
                 }
             }
-            else
-            {
+            else{
                 Debug.WriteLine("Parameter is not Tour");
             }
         }
 
         private void TourLogMenuItemDoubleClick(object parameter)
         {
-            if (parameter is TourLog selectedTourLog)
-            {
+            if (parameter is TourLog selectedTourLog){
                 var addTourLogWindow = new AddTourLogWindow(TourLogViewModel);
                 addTourLogWindow.ShowDialog();
             }
@@ -193,16 +183,13 @@ namespace TourPlanner.ViewModels
 
         private void ListBoxSelectionChanged(object parameter)
         {
-            if (parameter is Tour selectedTour)
-            {
+            if (parameter is Tour selectedTour){
                 TourViewModel.SelectedTour = selectedTour;
                 TourLogViewModel.TourLogs = selectedTour.TourLogs;
-                SetGeneralContent(selectedTour);
+                SetGeneralContentOnListChange(selectedTour);
             }
         }
-
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null){
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }

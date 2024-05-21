@@ -8,7 +8,7 @@ using System.Windows.Input;
 using Models;
 using TourPlanner.ViewModels;
 using TourPlanner.Views;
-using TourPlannerBusinessLayer.Services;
+using TourPlannerBusinessLayer.Service;
 
 namespace TourPlanner.Viewmodels
 {
@@ -135,16 +135,14 @@ namespace TourPlanner.Viewmodels
             }
         }
 
-        public ObservableCollection<string> DifficultyOptions { get; } = new ObservableCollection<string>
-        {
+        public ObservableCollection<string> DifficultyOptions { get; } = new ObservableCollection<string>{
             "Easy",
             "Moderate",
             "Difficult",
             "Extreme"
         };
 
-        public ObservableCollection<String> RatingOptions { get; } = new ObservableCollection<string>
-        {
+        public ObservableCollection<String> RatingOptions { get; } = new ObservableCollection<string>{
             "1",
             "2",
             "3",
@@ -154,8 +152,7 @@ namespace TourPlanner.Viewmodels
 
         private TourViewModel tourViewModel;
 
-        public TourLogViewModel(TourViewModel tourViewModel, TourLogService tourLogService)
-        {
+        public TourLogViewModel(TourViewModel tourViewModel, TourLogService tourLogService){
             this.tourViewModel = tourViewModel;
             this._tourLogService = tourLogService;
             SaveTourLogCommand = new RelayCommand(async (parameter) => await SaveTourLog(parameter));
@@ -177,32 +174,26 @@ namespace TourPlanner.Viewmodels
 
         private async void UpdateTourLogs()
         {
-            if (SelectedTour != null)
-            {
+            if (SelectedTour != null){
                 var logs = await _tourLogService.GetTourLogsByTourIdAsync(SelectedTour.Id);
                 TourLogs = new ObservableCollection<TourLog>(logs);
             }
-            else
-            {
+            else{
                 TourLogs?.Clear();
             }
         }
 
         private async Task SaveTourLog(object? parameter)
         {
-            if (SelectedTour == null)
-            {
+            if (SelectedTour == null){
                 return;
             }
 
             var selectedWeatherOptions = WeatherOptions.Where(w => w.IsChecked).Select(w => w.Name).ToList();
             var selectedWeather = string.Join(", ", selectedWeatherOptions);
 
-            if (SelectedTourLog == null)
-            {
-                // Add new TourLog
-                var newTourLog = new TourLog
-                {
+            if (SelectedTourLog == null){
+                var newTourLog = new TourLog{
                     Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null,
                     Comment = SelectedComment,
                     Difficulty = SelectedDifficulty,
@@ -210,19 +201,17 @@ namespace TourPlanner.Viewmodels
                     TotalTime = SelectedTotalTime,
                     Weather = selectedWeather,
                     Rating = SelectedRating,
-                    TourId = SelectedTour.Id // Set the TourId for the new TourLog
+                    TourId = SelectedTour.Id 
                 };
 
-                await _tourLogService.AddTourLogAsync(newTourLog); // Save to database
+                await _tourLogService.AddTourLogAsync(newTourLog);
                 SelectedTour.TourLogs.Add(newTourLog);
             }
             else
             {
-                // Update existing TourLog
                 var tourLogToUpdate = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
 
-                if (tourLogToUpdate != null)
-                {
+                if (tourLogToUpdate != null){
                     tourLogToUpdate.Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null;
                     tourLogToUpdate.Comment = SelectedComment;
                     tourLogToUpdate.Difficulty = SelectedDifficulty;
@@ -230,13 +219,10 @@ namespace TourPlanner.Viewmodels
                     tourLogToUpdate.TotalTime = SelectedTotalTime;
                     tourLogToUpdate.Weather = selectedWeather;
                     tourLogToUpdate.Rating = SelectedRating;
-                    await _tourLogService.UpdateTourLogAsync(tourLogToUpdate); // Update in database
+                    await _tourLogService.UpdateTourLogAsync(tourLogToUpdate);
                 }
             }
 
-            // Update the TourLogs list
-
-            // Close the window after saving
             if (parameter is Window window)
             {
                 window.DialogResult = true;
@@ -247,17 +233,14 @@ namespace TourPlanner.Viewmodels
 
         public void DeleteSelectedTourLog(object? parameter)
         {
-            if (SelectedTour == null || SelectedTourLog == null)
-            {
+            if (SelectedTour == null || SelectedTourLog == null){
                 return;
             }
-
             var tourLogToDelete = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
 
-            if (tourLogToDelete != null)
-            {
+            if (tourLogToDelete != null){
                 SelectedTour.TourLogs.Remove(tourLogToDelete);
-                _tourLogService.DeleteTourLogAsync(tourLogToDelete); // Delete from database
+                _tourLogService.DeleteTourLogAsync(tourLogToDelete);
                 OnPropertyChanged(nameof(TourLogs));
             }
             SelectedTourLog = null;
@@ -265,39 +248,31 @@ namespace TourPlanner.Viewmodels
             OnPropertyChanged(nameof(SelectedTourLog));
         }
 
-        private void LoadSelectedTourLogData()
-        {
+        private void LoadSelectedTourLogData(){
             SelectedDate = SelectedTourLog?.Date;
             SelectedComment = SelectedTourLog?.Comment;
             SelectedTotalDistance = SelectedTourLog?.TotalDistance ?? 0;
             SelectedTotalTime = SelectedTourLog?.TotalTime ?? 0;
             SelectedDifficulty = SelectedTourLog?.Difficulty;
 
-            foreach (var option in WeatherOptions)
-            {
+            foreach (var option in WeatherOptions){
                 option.IsChecked = SelectedTourLog?.Weather?.Split(',').Contains(option.Name.Trim()) ?? false;
             }
         }
 
-        public void OpenTourLogWindow(object parameter)
-        {
-            if (SelectedTourLog == null)
-            {
-                // Create a new TourLog
+        public void OpenTourLogWindow(object parameter){
+            if (SelectedTourLog == null){
+                
                 SelectedTourLog = new TourLog();
                 LoadSelectedTourLogData();
             }
-
             var addTourLogWindow = new AddTourLogWindow(this);
             addTourLogWindow.ShowDialog();
-
-            // Reset the SelectedTourLog after closing the window
             SelectedTourLog = null;
             LoadSelectedTourLogData();
         }
 
-        protected void OnPropertyChanged(string propertyName)
-        {
+        protected void OnPropertyChanged(string propertyName){
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
