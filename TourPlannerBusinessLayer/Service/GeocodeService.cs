@@ -13,7 +13,7 @@ namespace TourPlannerBusinessLayer.Service
 
         public async Task<(double, double)> GetCoordinatesAsync(string address){
             if (address != null){
-                string apiKey = "5b3ce3597851110001cf62482aefcf75b95c4b94b6ec0bc33d9d3337";
+                string apiKey = "5b3ce3597851110001cf6248a50f39187e9e47bd9876ff57c061a58f";
                 string url = $"https://api.openrouteservice.org/geocode/search?api_key={apiKey}&text={Uri.EscapeDataString(address)}";
 
                 try{

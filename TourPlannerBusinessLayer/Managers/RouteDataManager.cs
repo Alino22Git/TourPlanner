@@ -30,5 +30,13 @@ namespace TourPlannerBusinessLayer.Managers
             Directory.CreateDirectory(resourceDir); 
             return Path.Combine(resourceDir, relativePath);
         }
+
+        public async Task<string> GetDistanceAsync(string from, string to)
+        {
+            var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from);
+            var (endLongitude, endLatitude) = await _geocodeService.GetCoordinatesAsync(to);
+            string distance = await _directionService.GetRouteDistanceAsync(startLongitude, startLatitude, endLongitude, endLatitude);
+            return distance;
+        }
     }
 }

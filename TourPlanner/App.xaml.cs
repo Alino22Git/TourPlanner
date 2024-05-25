@@ -7,6 +7,7 @@ using TourPlanner.Views;
 using TourPlannerDAL;
 using System.Windows.Controls;
 using TourPlanner.Viewmodels;
+using TourPlannerBusinessLayer.Managers;
 using TourPlannerBusinessLayer.Service;
 
 namespace TourPlanner
@@ -41,7 +42,7 @@ namespace TourPlanner
             services.AddTransient<MainViewModel>();
             services.AddTransient<TourViewModel>();
             services.AddTransient<TourLogViewModel>();
-
+            services.AddTransient<RouteDataManager>();
             services.AddTransient<MainWindow>(provider => {
                 var mainViewModel = provider.GetRequiredService<MainViewModel>();
                 return new MainWindow(mainViewModel);
@@ -53,7 +54,8 @@ namespace TourPlanner
                 var tourLogService = provider.GetRequiredService<TourLogService>();
                 var geocodeService = provider.GetRequiredService<GeocodeService>();
                 var directionService = provider.GetRequiredService<DirectionService>();
-                return new MainViewModel(contentControl, tourService, tourLogService, geocodeService, directionService);
+                var routeDataManager = provider.GetRequiredService<RouteDataManager>();
+                return new MainViewModel(contentControl, tourService, tourLogService, routeDataManager);
             });
         }
     }
