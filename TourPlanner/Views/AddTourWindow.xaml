@@ -16,9 +16,6 @@
         <Label Content="Transport Type:" Foreground="White"/>
         <ComboBox ItemsSource="{Binding TransportTypeOptions}" SelectedItem="{Binding SelectedTour.TransportType}" />
 
-        <Label Content="Time:" Foreground="White"/>
-        <TextBox Text="{Binding SelectedTour.Time}" Margin="0,0,0,5"/>
-
         <Label Content="Description:" Foreground="White"/>
         <TextBox Text="{Binding SelectedTour.Description}" Margin="0,0,0,5"/>
 

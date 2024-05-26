@@ -54,8 +54,7 @@ namespace TourPlanner.ViewModels
         public ObservableCollection<string> TransportTypeOptions { get; } = new ObservableCollection<string>{
             "Hike",
             "Bicycle",
-            "Car",
-            "Motorcycle"
+            "Car"
         };
 
         private Tour? OriginalTour { get; set; }
@@ -72,21 +71,6 @@ namespace TourPlanner.ViewModels
         private async void LoadTours()
         {
             var toursFromDb = await _tourService.GetToursAsync();
-            foreach (var tour in toursFromDb)
-            {
-                if (!string.IsNullOrEmpty(tour.From) && !string.IsNullOrEmpty(tour.To))
-                {
-                    try
-                    {
-                        tour.Distance = await _routeDataManager.GetDistanceAsync(tour.From, tour.To);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Error getting distance for tour {tour.Name}: {ex.Message}");
-                        tour.Distance = null; // Set to null if distance couldn't be fetched
-                    }
-                }
-            }
             Tours = new ObservableCollection<Tour>(toursFromDb);
         }
 
@@ -96,17 +80,19 @@ namespace TourPlanner.ViewModels
 
             OriginalTour = originalTour;
             var distance = string.Empty;
+            var time = string.Empty;
 
             if (!string.IsNullOrEmpty(originalTour.From) && !string.IsNullOrEmpty(originalTour.To))
             {
                 try
                 {
-                    distance = await _routeDataManager.GetDistanceAsync(originalTour.From, originalTour.To);
+                    (distance, time) = await _routeDataManager.GetDistanceAndDurationAsync(originalTour.From, originalTour.To, originalTour.TransportType);
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error getting distance for tour {originalTour.Name}: {ex.Message}");
+                    Debug.WriteLine($"Error getting distance and time for tour {originalTour.Name}: {ex.Message}");
                     distance = null; // Set to null if distance couldn't be fetched
+                    time = null; // Set to null if time couldn't be fetched
                 }
             }
 
@@ -117,7 +103,7 @@ namespace TourPlanner.ViewModels
                 From = originalTour.From,
                 To = originalTour.To,
                 Distance = distance,
-                Time = originalTour.Time,
+                Time = time,
                 Description = originalTour.Description,
                 TransportType = originalTour.TransportType,
                 TourLogs = new ObservableCollection<TourLog>(originalTour.TourLogs)
@@ -145,12 +131,15 @@ namespace TourPlanner.ViewModels
                         {
                             try
                             {
-                                SelectedTour.Distance = await _routeDataManager.GetDistanceAsync(SelectedTour.From, SelectedTour.To);
+                                var (distance, time) = await _routeDataManager.GetDistanceAndDurationAsync(SelectedTour.From, SelectedTour.To, SelectedTour.TransportType);
+                                SelectedTour.Distance = distance;
+                                SelectedTour.Time = time;
                             }
                             catch (Exception ex)
                             {
-                                Debug.WriteLine($"Error getting distance for new tour: {ex.Message}");
+                                Debug.WriteLine($"Error getting distance and time for new tour: {ex.Message}");
                                 SelectedTour.Distance = null; // Set to null if distance couldn't be fetched
+                                SelectedTour.Time = null; // Set to null if time couldn't be fetched
                             }
                         }
                         await _tourService.AddTourAsync(SelectedTour);
@@ -168,12 +157,15 @@ namespace TourPlanner.ViewModels
                         {
                             try
                             {
-                                OriginalTour.Distance = await _routeDataManager.GetDistanceAsync(OriginalTour.From, OriginalTour.To);
+                                var (distance, time) = await _routeDataManager.GetDistanceAndDurationAsync(OriginalTour.From, OriginalTour.To, OriginalTour.TransportType);
+                                OriginalTour.Distance = distance;
+                                OriginalTour.Time = time;
                             }
                             catch (Exception ex)
                             {
-                                Debug.WriteLine($"Error getting distance for existing tour: {ex.Message}");
+                                Debug.WriteLine($"Error getting distance and time for existing tour: {ex.Message}");
                                 OriginalTour.Distance = null; // Set to null if distance couldn't be fetched
+                                OriginalTour.Time = null; // Set to null if time couldn't be fetched
                             }
                         }
                         await _tourService.UpdateTourAsync(OriginalTour);

@@ -31,12 +31,13 @@ namespace TourPlannerBusinessLayer.Managers
             return Path.Combine(resourceDir, relativePath);
         }
 
-        public async Task<string> GetDistanceAsync(string from, string to)
+        public async Task<(string Distance, string Duration)> GetDistanceAndDurationAsync(string from, string to, string transportType)
         {
             var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from);
             var (endLongitude, endLatitude) = await _geocodeService.GetCoordinatesAsync(to);
-            string distance = await _directionService.GetRouteDistanceAsync(startLongitude, startLatitude, endLongitude, endLatitude);
-            return distance;
+            var (distance, duration) = await _directionService.GetRouteDistanceAndDurationAsync(startLongitude, startLatitude, endLongitude, endLatitude, transportType);
+            return (distance, duration);
         }
+
     }
 }

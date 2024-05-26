@@ -40,11 +40,30 @@ namespace TourPlannerBusinessLayer.Service
             }
         }
 
-        public async Task<string?> GetRouteDistanceAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude)
+        public async Task<(string? Distance, string? Duration)> GetRouteDistanceAndDurationAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string transportType)
         {
             string apiKey = "5b3ce3597851110001cf62482aefcf75b95c4b94b6ec0bc33d9d3337";
-            string url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+            string url;
+            if (transportType != "Car" && transportType != "Bicycle" && transportType != "Hike")
+            {
+                return (null, null);
+            }else if (transportType == "Car")
+            {
+                 url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+            }
+            else if(transportType == "Hike")
+            {
+                 url = $"https://api.openrouteservice.org/v2/directions/foot-hiking?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
 
+            }else if (transportType == "Bicycle")
+            {
+                 url = $"https://api.openrouteservice.org/v2/directions/cycling-regular?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+
+            }
+            else
+            {
+                 url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+            }
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync(url);
@@ -52,7 +71,7 @@ namespace TourPlannerBusinessLayer.Service
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
                     Debug.WriteLine($"Error fetching directions data: {response.StatusCode} - {response.ReasonPhrase} - {errorResponse}");
-                    return null;
+                    return (null, null);
                 }
 
                 string result = await response.Content.ReadAsStringAsync();
@@ -69,19 +88,25 @@ namespace TourPlannerBusinessLayer.Service
                         if (segments.GetArrayLength() > 0)
                         {
                             JsonElement firstSegment = segments[0];
-                            string distance = firstSegment.GetProperty("distance").GetDouble().ToString();
-                            return distance;
+                            double distance = firstSegment.GetProperty("distance").GetDouble();
+                            double duration = firstSegment.GetProperty("duration").GetDouble();
+                            double distanceInKm = distance / 1000;
+                            double durationInHours = duration / 3600;
+                            string distanceInKmString = distanceInKm.ToString("0.00") + " km";
+                            string durationInHoursString = durationInHours.ToString("0.00") + " h";
+                            return (distanceInKmString, durationInHoursString);
                         }
                     }
                 }
 
-                return null;
+                return (null, null);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error fetching directions data: {ex.Message}");
-                return null;
+                return (null, null);
             }
         }
+
     }
 }
