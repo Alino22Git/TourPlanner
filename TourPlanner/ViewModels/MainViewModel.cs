@@ -13,6 +13,7 @@ using TourPlanner.Viewmodels;
 using TourPlanner.Views;
 using TourPlannerBusinessLayer.Managers;
 using TourPlannerBusinessLayer.Service;
+using TourPlannerLogging;
 
 namespace TourPlanner.ViewModels
 {
@@ -21,6 +22,7 @@ namespace TourPlanner.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private readonly RouteDataManager _routeDataManager;
+        private static readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
 
         public TourViewModel TourViewModel { get; }
         public TourLogViewModel TourLogViewModel { get; }
@@ -55,7 +57,7 @@ namespace TourPlanner.ViewModels
             _routeDataManager = routeDataManager;
             TourViewModel = new TourViewModel(tourService, routeDataManager);
             TourLogViewModel = new TourLogViewModel(TourViewModel, tourLogService);
-
+            logger.Debug("MainViewModel created");
             TourViewModel.PropertyChanged += async (s, e) =>
             {
                 if (e.PropertyName == nameof(TourViewModel.SelectedTour))
