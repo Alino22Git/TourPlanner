@@ -56,7 +56,7 @@ namespace TourPlanner.ViewModels
             _dynamicContentControl = dynamicContentControl;
             _routeDataManager = routeDataManager;
             TourViewModel = new TourViewModel(tourService, routeDataManager);
-            TourLogViewModel = new TourLogViewModel(TourViewModel, tourLogService);
+            TourLogViewModel = new TourLogViewModel(TourViewModel, tourLogService, tourService);
             logger.Debug("MainViewModel created");
             TourViewModel.PropertyChanged += async (s, e) =>
             {
