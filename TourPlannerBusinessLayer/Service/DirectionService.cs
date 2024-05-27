@@ -15,9 +15,8 @@ namespace TourPlannerBusinessLayer.Service
             _httpClient = httpClient;
         }
 
-        public async Task<string> GetDirectionsAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude)
+        public async Task<string> GetDirectionsAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string apiKey)
         {
-            string apiKey = "5b3ce3597851110001cf62482aefcf75b95c4b94b6ec0bc33d9d3337";
             string url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
 
             try
@@ -40,10 +39,10 @@ namespace TourPlannerBusinessLayer.Service
             }
         }
 
-        public async Task<(string? Distance, string? Duration)> GetRouteDistanceAndDurationAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string transportType)
+        public async Task<(string? Distance, string? Duration)> GetRouteDistanceAndDurationAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string transportType, string apiKey)
         {
-            string apiKey = "5b3ce3597851110001cf62482aefcf75b95c4b94b6ec0bc33d9d3337";
             string url;
+
             if (transportType != "Car" && transportType != "Bicycle" && transportType != "Hike")
             {
                 return (null, null);
@@ -64,6 +63,7 @@ namespace TourPlannerBusinessLayer.Service
             {
                  url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
             }
+
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync(url);

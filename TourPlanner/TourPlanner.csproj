@@ -8,7 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.json" />
     <None Remove="Images\test.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +41,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Models\Models.csproj" />
     <ProjectReference Include="..\TourPlannerBusinessLayer\TourPlannerBusinessLayer.csproj" />
+    <ProjectReference Include="..\TourPlannerConfig\TourPlannerConfig.csproj" />
     <ProjectReference Include="..\TourPlannerDAL\TourPlannerDAL.csproj" />
   </ItemGroup>
 

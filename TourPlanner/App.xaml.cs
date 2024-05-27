@@ -2,6 +2,7 @@
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using TourPlanner.ViewModels;
 using TourPlanner.Views;
 using TourPlannerDAL;
@@ -9,14 +10,17 @@ using System.Windows.Controls;
 using TourPlanner.Viewmodels;
 using TourPlannerBusinessLayer.Managers;
 using TourPlannerBusinessLayer.Service;
+using TourPlannerConfig;
 
 namespace TourPlanner
 {
     public partial class App : Application
     {
         public IServiceProvider ServiceProvider { get; private set; }
+        public IConfiguration Configuration { get; private set; }
 
-        protected override void OnStartup(StartupEventArgs e){
+        protected override void OnStartup(StartupEventArgs e)
+        {
             base.OnStartup(e);
 
             var serviceCollection = new ServiceCollection();
@@ -28,9 +32,19 @@ namespace TourPlanner
             mainWindow.Show();
         }
 
-        private void ConfigureServices(IServiceCollection services){
+        private void ConfigureServices(IServiceCollection services)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            Configuration = builder.Build();
+
+            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton<IConfigurationService, ConfigurationService>();
+
             services.AddDbContext<TourPlannerDbContext>(options =>
-                options.UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=root;Password=tourplanner"), ServiceLifetime.Scoped);
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")),
+                ServiceLifetime.Scoped);
 
             services.AddHttpClient<GeocodeService>();
             services.AddHttpClient<DirectionService>();
