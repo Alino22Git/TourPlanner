@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TourPlannerDAL\TourPlannerDAL.csproj" />
+    <ProjectReference Include="..\TourPlannerLogging\TourPlannerLogging.csproj" />
   </ItemGroup>
 
 </Project>

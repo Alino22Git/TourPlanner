@@ -49,6 +49,10 @@ namespace TourPlannerLogging
         {
             this.logger.Fatal(message);
         }
+        public void Info(string message)
+        {
+            this.logger.Info(message);
+        }
     }
 
 }

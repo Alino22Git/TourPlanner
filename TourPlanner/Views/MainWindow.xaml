@@ -40,6 +40,8 @@
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Description:" FontWeight="Bold" Margin="0,5,5,0"/>
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Description}" Margin="0,5,5,0"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="Popularity:" FontWeight="Bold" Margin="0,5,5,0"/>
+                <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding Popularity}" Margin="0,5,5,0"/>
             </Grid>
         </DataTemplate>
     </Window.Resources>

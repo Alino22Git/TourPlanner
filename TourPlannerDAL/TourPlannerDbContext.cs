@@ -26,6 +26,8 @@ namespace TourPlannerDAL
                 entity.Property(e => e.Time).HasMaxLength(50);
                 entity.Property(e => e.Description).HasMaxLength(500);
                 entity.Property(e => e.TransportType).HasMaxLength(500);
+                entity.Property(e => e.Popularity).HasMaxLength(500);
+                entity.Property(e => e.ChildFriendliness).HasMaxLength(500);
             });
 
             modelBuilder.Entity<TourLog>(entity =>

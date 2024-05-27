@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using TourPlannerBusinessLayer.Service;
-
+using TourPlannerLogging;
 namespace TourPlannerBusinessLayer.Managers
 {
     public class RouteDataManager
@@ -10,7 +10,7 @@ namespace TourPlannerBusinessLayer.Managers
         private readonly GeocodeService _geocodeService;
         private readonly DirectionService _directionService;
         private readonly string _apiKey;
-
+        private static readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
         public RouteDataManager(GeocodeService geocodeService, DirectionService directionService, IConfiguration configuration)
         {
             _geocodeService = geocodeService;
@@ -20,32 +20,62 @@ namespace TourPlannerBusinessLayer.Managers
 
         public async Task<(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string directions)> GetTourDataAsync(string from, string to)
         {
-            var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from, _apiKey);
-            var (endLongitude, endLatitude) = await _geocodeService.GetCoordinatesAsync(to, _apiKey);
-            string directions = await _directionService.GetDirectionsAsync(startLongitude, startLatitude, endLongitude, endLatitude, _apiKey);
-            return (startLongitude, startLatitude, endLongitude, endLatitude, directions);
+            try {
+                var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from, _apiKey);
+                var (endLongitude, endLatitude) = await _geocodeService.GetCoordinatesAsync(to, _apiKey);
+                string directions = await _directionService.GetDirectionsAsync(startLongitude, startLatitude, endLongitude, endLatitude, _apiKey);
+                return (startLongitude, startLatitude, endLongitude, endLatitude, directions);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error retireving tour Data {ex.Message}");
+                return (0, 0, 0, 0, "");
+            }
         }
 
         public async Task SaveDirectionsToFileAsync(string directions, string filePath)
         {
-            string jsContent = $"const directions = {directions};";
-            await File.WriteAllTextAsync(filePath, jsContent);
+            try
+            { 
+                string jsContent = $"const directions = {directions};";
+                await File.WriteAllTextAsync(filePath, jsContent);
+                logger.Info($"Directions saved to file {filePath}");
+            } catch (Exception ex)
+            {
+                logger.Error($"Error saving directions to file {ex.Message}");
+            }
         }
 
         public string GetProjectResourcePath(string relativePath)
         {
-            string projectDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
-            string resourceDir = Path.Combine(projectDir, "Resources");
-            Directory.CreateDirectory(resourceDir);
-            return Path.Combine(resourceDir, relativePath);
+            try
+            {
+                string projectDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
+                string resourceDir = Path.Combine(projectDir, "Resources");
+                Directory.CreateDirectory(resourceDir);
+                return Path.Combine(resourceDir, relativePath);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error getting project resource path {ex.Message}");
+                return "";
+            }
         }
 
         public async Task<(string Distance, string Duration)> GetDistanceAndDurationAsync(string from, string to, string transportType)
         {
-            var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from, _apiKey);
-            var (endLongitude, endLatitude) = await _geocodeService.GetCoordinatesAsync(to, _apiKey);
-            var (distance, duration) = await _directionService.GetRouteDistanceAndDurationAsync(startLongitude, startLatitude, endLongitude, endLatitude, transportType, _apiKey);
-            return (distance, duration);
+            try
+            {
+                var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from, _apiKey);
+                var (endLongitude, endLatitude) = await _geocodeService.GetCoordinatesAsync(to, _apiKey);
+                var (distance, duration) = await _directionService.GetRouteDistanceAndDurationAsync(startLongitude, startLatitude, endLongitude, endLatitude, transportType, _apiKey);
+                return (distance, duration);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error getting distance and duration {ex.Message}");
+                return ("", "");
+            }
         }
     }
 }

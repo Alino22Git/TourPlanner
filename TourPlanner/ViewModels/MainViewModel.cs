@@ -81,32 +81,47 @@ namespace TourPlanner.ViewModels
 
         private async Task InitializeWebViewAsync(WebView2 webView)
         {
-            if (webView != null)
+            try
             {
-                _webView = webView;
-                await webView.EnsureCoreWebView2Async(null);
-                await UpdateWebViewAsync();
+                if (webView != null)
+                {
+                    _webView = webView;
+                    await webView.EnsureCoreWebView2Async(null);
+                    await UpdateWebViewAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error initializing WebView: {ex.Message}");
             }
         }
+        
 
         private async Task UpdateWebViewAsync()
         {
-            if (_webView != null && TourViewModel.SelectedTour != null && TourLogViewModel.SelectedTour.From != null)
+            try
             {
-                var (startLongitude, startLatitude, endLongitude, endLatitude, directions) = await _routeDataManager.GetTourDataAsync(TourViewModel.SelectedTour.From, TourViewModel.SelectedTour.To);
-
-                string filePath = _routeDataManager.GetProjectResourcePath("directions.js");
-                await _routeDataManager.SaveDirectionsToFileAsync(directions, filePath);
-
-                string htmlPath = _routeDataManager.GetProjectResourcePath("leaflet.html");
-                if (File.Exists(htmlPath))
+                if (_webView != null && TourViewModel.SelectedTour != null && TourLogViewModel.SelectedTour.From != null)
                 {
-                    _webView.CoreWebView2.Navigate(htmlPath);
+                    var (startLongitude, startLatitude, endLongitude, endLatitude, directions) = await _routeDataManager.GetTourDataAsync(TourViewModel.SelectedTour.From, TourViewModel.SelectedTour.To);
+
+                    string filePath = _routeDataManager.GetProjectResourcePath("directions.js");
+                    await _routeDataManager.SaveDirectionsToFileAsync(directions, filePath);
+
+                    string htmlPath = _routeDataManager.GetProjectResourcePath("leaflet.html");
+                    if (File.Exists(htmlPath))
+                    {
+                        _webView.CoreWebView2.Navigate(htmlPath);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Die Datei {htmlPath} wurde nicht gefunden.", "Datei nicht gefunden", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
-                else
-                {
-                    MessageBox.Show($"Die Datei {htmlPath} wurde nicht gefunden.", "Datei nicht gefunden", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error updating WebView: {ex.Message}");
             }
         }
 
