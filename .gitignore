@@ -461,3 +461,4 @@ $RECYCLE.BIN/
 *.dat
 *.lproj
 *.dSYM/
+TourPlanner/appsettings.json
