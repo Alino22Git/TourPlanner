@@ -11,9 +11,8 @@ namespace TourPlannerBusinessLayer.Service
             _httpClient = httpClient;
         }
 
-        public async Task<(double, double)> GetCoordinatesAsync(string address){
+        public async Task<(double, double)> GetCoordinatesAsync(string address, string apiKey){
             if (address != null){
-                string apiKey = "5b3ce3597851110001cf62482aefcf75b95c4b94b6ec0bc33d9d3337";
                 string url = $"https://api.openrouteservice.org/geocode/search?api_key={apiKey}&text={Uri.EscapeDataString(address)}";
 
                 try{
