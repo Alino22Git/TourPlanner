@@ -212,7 +212,7 @@ namespace TourPlanner.Viewmodels
 
                 await _tourLogService.AddTourLogAsync(newTourLog);
                 SelectedTour.TourLogs.Add(newTourLog);
-                await _tourService.UpdateTourAsync(SelectedTour); // Aktualisieren Sie die Tour in der DB
+                await _tourService.UpdateTourAsync(SelectedTour); 
             }
             else
             {
@@ -228,7 +228,7 @@ namespace TourPlanner.Viewmodels
                     tourLogToUpdate.Weather = selectedWeather;
                     tourLogToUpdate.Rating = SelectedRating;
                     await _tourLogService.UpdateTourLogAsync(tourLogToUpdate);
-                    await _tourService.UpdateTourAsync(SelectedTour); // Aktualisieren Sie die Tour in der DB
+                    await _tourService.UpdateTourAsync(SelectedTour); 
                 }
             }
 
@@ -253,7 +253,7 @@ namespace TourPlanner.Viewmodels
                 SelectedTour.TourLogs.Remove(tourLogToDelete);
                 await _tourLogService.DeleteTourLogAsync(tourLogToDelete);
                 OnPropertyChanged(nameof(TourLogs));
-                await _tourService.UpdateTourAsync(SelectedTour); // Aktualisieren Sie die Tour in der DB
+                await _tourService.UpdateTourAsync(SelectedTour); 
             }
             SelectedTourLog = null;
             UpdateTourLogs();
