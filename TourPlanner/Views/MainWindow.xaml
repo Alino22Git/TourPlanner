@@ -20,6 +20,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -42,6 +43,9 @@
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Description}" Margin="0,5,5,0"/>
                 <TextBlock Grid.Row="2" Grid.Column="2" Text="Popularity:" FontWeight="Bold" Margin="0,5,5,0"/>
                 <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding Popularity}" Margin="0,5,5,0"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Child-Friendliness:" FontWeight="Bold" Margin="0,5,5,0"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ChildFriendliness}" Margin="0,5,5,0"/>
             </Grid>
         </DataTemplate>
     </Window.Resources>
@@ -111,7 +115,7 @@
                 <Menu Grid.Row="0" Background="#FF312929" Foreground="White" Grid.ColumnSpan="2">
                     <MenuItem Header="General" Command="{Binding SetGeneralContentCommand}"/>
                     <MenuItem Header="Route" Command="{Binding SetRouteContentCommand}"/>
-                    <MenuItem Header="Misc"/>
+                    <MenuItem Header="Misc" Command="{Binding ReportGenCommand}"/>
                 </Menu>
 
                 <ContentControl Grid.Row="1" Margin="10,10,10,10" x:Name="DynamicContentControl" Content="{Binding DynamicContentControl}" Grid.ColumnSpan="2"/>

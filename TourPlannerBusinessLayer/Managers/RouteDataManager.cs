@@ -18,12 +18,12 @@ namespace TourPlannerBusinessLayer.Managers
             _apiKey = configuration["ApiKeys:OpenRouteService"];
         }
 
-        public async Task<(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string directions)> GetTourDataAsync(string from, string to)
+        public async Task<(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string directions)> GetTourDataAsync(string from, string to, string transportType)
         {
             try {
                 var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from, _apiKey);
                 var (endLongitude, endLatitude) = await _geocodeService.GetCoordinatesAsync(to, _apiKey);
-                string directions = await _directionService.GetDirectionsAsync(startLongitude, startLatitude, endLongitude, endLatitude, _apiKey);
+                string directions = await _directionService.GetDirectionsAsync(startLongitude, startLatitude, endLongitude, endLatitude, _apiKey, transportType);
                 return (startLongitude, startLatitude, endLongitude, endLatitude, directions);
             }
             catch (Exception ex)

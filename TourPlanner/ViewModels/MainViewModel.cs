@@ -38,6 +38,8 @@ namespace TourPlanner.ViewModels
         public ICommand TourLogMenuItemDoubleClickCommand { get; }
         public ICommand ListBoxSelectionChangedCommand { get; }
 
+        public ICommand ReportGenCommand { get; }
+
         private ContentControl _dynamicContentControl;
         private WebView2 _webView;
         private bool hideWebView = true;
@@ -77,6 +79,7 @@ namespace TourPlanner.ViewModels
             ListBoxItemDoubleClickCommand = new RelayCommand(ListBoxItemDoubleClick);
             TourLogMenuItemDoubleClickCommand = new RelayCommand(TourLogMenuItemDoubleClick);
             ListBoxSelectionChangedCommand = new RelayCommand(ListBoxSelectionChanged);
+            ReportGenCommand = new RelayCommand(GenerateReport);
         }
 
         private async Task InitializeWebViewAsync(WebView2 webView)
@@ -96,14 +99,14 @@ namespace TourPlanner.ViewModels
             }
         }
         
-
+        
         private async Task UpdateWebViewAsync()
         {
             try
             {
                 if (_webView != null && TourViewModel.SelectedTour != null && TourLogViewModel.SelectedTour.From != null)
                 {
-                    var (startLongitude, startLatitude, endLongitude, endLatitude, directions) = await _routeDataManager.GetTourDataAsync(TourViewModel.SelectedTour.From, TourViewModel.SelectedTour.To);
+                    var (startLongitude, startLatitude, endLongitude, endLatitude, directions) = await _routeDataManager.GetTourDataAsync(TourViewModel.SelectedTour.From, TourViewModel.SelectedTour.To, TourViewModel.SelectedTour.TransportType);
 
                     string filePath = _routeDataManager.GetProjectResourcePath("directions.js");
                     await _routeDataManager.SaveDirectionsToFileAsync(directions, filePath);
@@ -221,6 +224,15 @@ namespace TourPlanner.ViewModels
                 TourViewModel.SelectedTour = selectedTour;
                 TourLogViewModel.TourLogs = selectedTour.TourLogs;
                 SetGeneralContentOnListChange(selectedTour);
+            }
+        }
+
+        private void GenerateReport(object parameter)
+        {
+            if (TourViewModel.SelectedTour != null)
+            {
+                var reportManager = new ReportManager();
+                reportManager.GenerateReport(TourViewModel.SelectedTour, "C:\\Users\\micha\\Desktop\\report.pdf");
             }
         }
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
