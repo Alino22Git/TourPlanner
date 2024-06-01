@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Web.WebView2.Wpf;
+using Microsoft.Win32;
 using Models;
 using TourPlanner.Viewmodels;
 using TourPlanner.Views;
@@ -22,6 +23,8 @@ namespace TourPlanner.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private readonly RouteDataManager _routeDataManager;
+        private readonly ReportManager _reportManager;
+        private readonly TourService _tourService;
         private static readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
 
         public TourViewModel TourViewModel { get; }
@@ -31,14 +34,16 @@ namespace TourPlanner.ViewModels
         public ICommand OpenAddTourLogWindowCommand { get; }
         public ICommand InitializeWebViewCommand { get; }
 
-        public ICommand SetGeneralContentCommand { get; }
-        public ICommand SetRouteContentCommand { get; }
 
         public ICommand ListBoxItemDoubleClickCommand { get; }
         public ICommand TourLogMenuItemDoubleClickCommand { get; }
         public ICommand ListBoxSelectionChangedCommand { get; }
 
         public ICommand ReportGenCommand { get; }
+        public ICommand SummaryReportGenCommand { get; }
+        public ICommand GenerateReportWithMapScreenshotCommand { get; }
+        public ICommand ExportToursCommand { get; }
+        public ICommand ImportToursCommand { get; }
 
         private ContentControl _dynamicContentControl;
         private WebView2 _webView;
@@ -53,10 +58,12 @@ namespace TourPlanner.ViewModels
             }
         }
 
-        public MainViewModel(ContentControl dynamicContentControl, TourService tourService, TourLogService tourLogService, RouteDataManager routeDataManager)
+        public MainViewModel(ContentControl dynamicContentControl, TourService tourService, TourLogService tourLogService, RouteDataManager routeDataManager, ReportManager reportManager, FileTransferManager fileTransferManager)
         {
             _dynamicContentControl = dynamicContentControl;
             _routeDataManager = routeDataManager;
+            _reportManager = reportManager;
+            _tourService = tourService;
             TourViewModel = new TourViewModel(tourService, routeDataManager);
             TourLogViewModel = new TourLogViewModel(TourViewModel, tourLogService, tourService);
             logger.Debug("MainViewModel created");
@@ -73,13 +80,48 @@ namespace TourPlanner.ViewModels
 
             OpenAddTourWindowCommand = new RelayCommand(OpenAddTourWindow);
             OpenAddTourLogWindowCommand = new RelayCommand(OpenAddTourLogWindow);
-            SetGeneralContentCommand = new RelayCommand(SetGeneralContent);
-            SetRouteContentCommand = new RelayCommand(SetRouteContent);
             InitializeWebViewCommand = new RelayCommand(async (parameter) => await InitializeWebViewAsync(parameter as WebView2));
             ListBoxItemDoubleClickCommand = new RelayCommand(ListBoxItemDoubleClick);
             TourLogMenuItemDoubleClickCommand = new RelayCommand(TourLogMenuItemDoubleClick);
             ListBoxSelectionChangedCommand = new RelayCommand(ListBoxSelectionChanged);
             ReportGenCommand = new RelayCommand(GenerateReport);
+            GenerateReportWithMapScreenshotCommand = new RelayCommand(async (parameter) =>
+            {
+                if (TourViewModel.SelectedTour != null)
+                {
+                    await reportManager.GenerateReportWithMapScreenshot(TourViewModel.SelectedTour, "C:\\Users\\micha\\Desktop\\report.pdf", tourService, _webView);
+                }
+            });
+            SummaryReportGenCommand = new RelayCommand((parameter) => GenerateSummaryReport("C:\\Users\\micha\\Desktop\\SummaryReport.pdf", _tourService));
+
+            ExportToursCommand = new RelayCommand(async (parameter) =>
+            {
+                var dialog = new SaveFileDialog
+                {
+                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                    DefaultExt = "json"
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    await fileTransferManager.ExportToursAsync(dialog.FileName);
+                }
+            });
+
+            ImportToursCommand = new RelayCommand(async (parameter) =>
+            {
+                var dialog = new OpenFileDialog
+                {
+                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                    DefaultExt = "json"
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    await fileTransferManager.ImportToursAsync(dialog.FileName);
+                     TourViewModel.LoadTours();
+                }
+            });
         }
 
         private async Task InitializeWebViewAsync(WebView2 webView)
@@ -98,8 +140,7 @@ namespace TourPlanner.ViewModels
                 logger.Error($"Error initializing WebView: {ex.Message}");
             }
         }
-        
-        
+
         private async Task UpdateWebViewAsync()
         {
             try
@@ -128,22 +169,7 @@ namespace TourPlanner.ViewModels
             }
         }
 
-        private void SetGeneralContent(object parameter)
-        {
-            hideWebView = true;
-            if (TourViewModel.SelectedTour != null)
-            {
-                DynamicContentControl.DataContext = TourViewModel;
-                DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
-                DynamicContentControl.Content = TourViewModel.SelectedTour;
-            }
-
-            if (_webView != null && hideWebView)
-            {
-                _webView.Visibility = Visibility.Collapsed;
-            }
-        }
-
+        
 
         private void SetGeneralContentOnListChange(object parameter)
         {
@@ -152,11 +178,10 @@ namespace TourPlanner.ViewModels
                 DynamicContentControl.DataContext = TourViewModel;
                 DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
                 DynamicContentControl.Content = TourViewModel.SelectedTour;
-            }
-
-            if (_webView != null && hideWebView)
-            {
-                _webView.Visibility = Visibility.Collapsed;
+                if (_webView != null)
+                {
+                    _webView.Visibility = Visibility.Visible;
+                }
             }
         }
 
@@ -231,13 +256,20 @@ namespace TourPlanner.ViewModels
         {
             if (TourViewModel.SelectedTour != null)
             {
-                var reportManager = new ReportManager();
-                reportManager.GenerateReport(TourViewModel.SelectedTour, "C:\\Users\\micha\\Desktop\\report.pdf");
+                _reportManager.GenerateReport(TourViewModel.SelectedTour, $"C:\\Users\\micha\\Desktop\\{TourViewModel.SelectedTour.Name}.pdf", _tourService);
+
             }
         }
+
+        private void GenerateSummaryReport(string destinationPath, TourService tourService)
+        {
+            _reportManager.GenerateSummaryReport(destinationPath, tourService);
+        }
+
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
 }

@@ -8,7 +8,7 @@
         xmlns:subViews="clr-namespace:TourPlanner.Views.SubViews"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="Tour Planner" Height="600" Width="800"
+        Title="Tour Planner" Height="800" Width="800"
         Style="{StaticResource MyStyle}"
         DataContext="{Binding RelativeSource={RelativeSource Self}}" 
         Foreground="White">
@@ -53,6 +53,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200*" />
+            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="400*" />
         </Grid.ColumnDefinitions>
 
@@ -60,120 +61,123 @@
             <RowDefinition Height="Auto" MinHeight="18" />
             <RowDefinition Height="Auto" MinHeight="32" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="5" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="*" />
+
+
         </Grid.RowDefinitions>
 
-        <subViews:UserMainMenu Grid.Row="0" Grid.ColumnSpan="3"/>
+        <subViews:UserMainMenu Grid.Row="0" Grid.ColumnSpan="3" DataContext="{Binding}"/>
         <subViews:UserSearchBar Grid.Row="1" Grid.ColumnSpan="3"/>
 
-        <Border Grid.Row="2" Grid.Column="0" BorderBrush="Gainsboro" BorderThickness="1" Grid.RowSpan="2">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+        <Grid Grid.Row="2" Grid.Column="0" Grid.RowSpan="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-                <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
-                    <MenuItem Header="Tours" Command="{Binding OpenAddTourWindowCommand}" />
-                    <MenuItem Header="Add Tour" Command="{Binding OpenAddTourWindowCommand}" Background="White" Foreground="#FF312929"/>
-                </Menu>
+            <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
+                <MenuItem Header="Tours" Command="{Binding OpenAddTourWindowCommand}" />
+                <MenuItem Header="Add Tour" Command="{Binding OpenAddTourWindowCommand}" Background="White" Foreground="#FF312929"/>
+            </Menu>
 
-                <ListBox Grid.Row="2" ItemsSource="{Binding TourViewModel.Tours}" Background="#FF312929" Foreground="White" 
-                         SelectedValuePath="Id" 
-                         SelectedItem="{Binding TourViewModel.SelectedTour}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}" Background="#FF312929" Foreground="White"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDoubleClick">
-                            <i:InvokeCommandAction Command="{Binding ListBoxItemDoubleClickCommand}" 
-                                                   CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding ListBoxSelectionChangedCommand}" 
-                                                   CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ListBox>
-            </Grid>
-        </Border>
+            <ListBox Grid.Row="2" ItemsSource="{Binding TourViewModel.Tours}" Background="#FF312929" Foreground="White" 
+                     SelectedValuePath="Id" 
+                     SelectedItem="{Binding TourViewModel.SelectedTour}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" Background="#FF312929" Foreground="White"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction Command="{Binding ListBoxItemDoubleClickCommand}" 
+                                               CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding ListBoxSelectionChangedCommand}" 
+                                               CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListBox>
+        </Grid>
 
-        <Border Grid.Row="2" Grid.Column="1" BorderBrush="Gainsboro" BorderThickness="1">
-            <Grid>
+        <GridSplitter Grid.Row="2" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gray" Grid.RowSpan="5"/>
+
+        <Grid Grid.Row="2" Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="263*"/>
+                <ColumnDefinition Width="268*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Menu Grid.Row="0" Background="#FF312929" Foreground="White" Grid.ColumnSpan="2">
+                <MenuItem Header="Generate Report" Command="{Binding GenerateReportWithMapScreenshotCommand}"/>
+                <MenuItem Header="Generate Summary Report" Command="{Binding SummaryReportGenCommand}"/>
+            </Menu>
+
+            <ContentControl Grid.Row="1" Margin="10,10,10,10" x:Name="DynamicContentControl" Content="{Binding DynamicContentControl}" Grid.ColumnSpan="2"/>
+        </Grid>
+
+        <GridSplitter Grid.Row="3" Grid.Column="2" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gray"/>
+        <Grid Grid.Row="4
+     " Grid.Column="2" Grid.RowSpan="1" Margin="0,0,0,0">
+            <wpf:WebView2 x:Name="webView" Source="about:blank" Grid.Row="2" Grid.ColumnSpan="2" />
+        </Grid>
+
+
+        <GridSplitter Grid.Row="5" Grid.Column="2" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gray"/>
+
+        <Grid Grid.Row="6" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
+                <MenuItem Header="Add Tour" Command="{Binding OpenAddTourWindowCommand}" />
+                <MenuItem Header="Add Tour Log" Command="{Binding OpenAddTourLogWindowCommand}" />
+            </Menu>
+
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="263*"/>
-                    <ColumnDefinition Width="268*"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="150"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Menu Grid.Row="0" Background="#FF312929" Foreground="White" Grid.ColumnSpan="2">
-                    <MenuItem Header="General" Command="{Binding SetGeneralContentCommand}"/>
-                    <MenuItem Header="Route" Command="{Binding SetRouteContentCommand}"/>
-                    <MenuItem Header="Misc" Command="{Binding ReportGenCommand}"/>
-                </Menu>
-
-                <ContentControl Grid.Row="1" Margin="10,10,10,10" x:Name="DynamicContentControl" Content="{Binding DynamicContentControl}" Grid.ColumnSpan="2"/>
+                <TextBlock Grid.Column="0" Text="Date" FontWeight="Bold" Foreground="White" Margin="5"/>
+                <TextBlock Grid.Column="1" Text="Total Time" FontWeight="Bold" Foreground="White" Margin="5"/>
+                <TextBlock Grid.Column="2" Text="Total Distance" FontWeight="Bold" Foreground="White" Margin="5"/>
             </Grid>
-        </Border>
 
-        <Border Grid.Row="2" Grid.Column="1" BorderBrush="Gainsboro" BorderThickness="1" Grid.RowSpan="1" Margin="0,20,0,0">
-            <Grid>
-                <wpf:WebView2 x:Name="webView" Source="about:blank" Grid.Row="2" Grid.ColumnSpan="2" />
-            </Grid>
-        </Border>
-
-        <Border Grid.Row="3" Grid.Column="1" BorderBrush="Gainsboro" BorderThickness="1">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Menu Grid.Row="0" Background="#FF312929" Foreground="White">
-                    <MenuItem Header="Add Tour" Command="{Binding OpenAddTourWindowCommand}" />
-                    <MenuItem Header="Add Tour Log" Command="{Binding OpenAddTourLogWindowCommand}" />
-                </Menu>
-
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="150"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Date" FontWeight="Bold" Foreground="White" Margin="5"/>
-                    <TextBlock Grid.Column="1" Text="Total Time" FontWeight="Bold" Foreground="White" Margin="5"/>
-                    <TextBlock Grid.Column="2" Text="Total Distance" FontWeight="Bold" Foreground="White" Margin="5"/>
-                </Grid>
-
-                <ListBox x:Name="TourLogsListBox" Grid.Row="2" ItemsSource="{Binding TourLogViewModel.TourLogs}" SelectedItem="{Binding TourLogViewModel.SelectedTourLog}" Background="#FF312929" Foreground="White">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="150"/>
-                                    <ColumnDefinition Width="150"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='{}{0:MM/dd/yyyy}'}" Foreground="White" Margin="5"/>
-                                <TextBlock Grid.Column="1" Text="{Binding TotalTime, StringFormat=N2}" Foreground="White" Margin="5"/>
-                                <TextBlock Grid.Column="2" Text="{Binding TotalDistance, StringFormat=N2}" Foreground="White" Margin="5"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDoubleClick">
-                            <i:InvokeCommandAction Command="{Binding TourLogMenuItemDoubleClickCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ListBox>
-            </Grid>
-        </Border>
+            <ListBox x:Name="TourLogsListBox" Grid.Row="2" ItemsSource="{Binding TourLogViewModel.TourLogs}" SelectedItem="{Binding TourLogViewModel.SelectedTourLog}" Background="#FF312929" Foreground="White">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="150"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='{}{0:MM/dd/yyyy}'}" Foreground="White" Margin="5"/>
+                            <TextBlock Grid.Column="1" Text="{Binding TotalTime, StringFormat=N2}" Foreground="White" Margin="5"/>
+                            <TextBlock Grid.Column="2" Text="{Binding TotalDistance, StringFormat=N2}" Foreground="White" Margin="5"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction Command="{Binding TourLogMenuItemDoubleClickCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListBox>
+        </Grid>
     </Grid>
 </Window>

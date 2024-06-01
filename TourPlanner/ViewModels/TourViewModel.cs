@@ -68,7 +68,7 @@ namespace TourPlanner.ViewModels
             DeleteTourCommand = new RelayCommand(async (parameter) => await DeleteSelectedTour(parameter));
         }
 
-        private async void LoadTours()
+        public async void LoadTours()
         {
             var toursFromDb = await _tourService.GetToursAsync();
             Tours = new ObservableCollection<Tour>(toursFromDb);
