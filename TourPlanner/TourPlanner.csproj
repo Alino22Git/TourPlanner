@@ -27,6 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="itext7" Version="7.2.4" />
+    <PackageReference Include="log4net" Version="2.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -43,6 +45,7 @@
     <ProjectReference Include="..\TourPlannerBusinessLayer\TourPlannerBusinessLayer.csproj" />
     <ProjectReference Include="..\TourPlannerConfig\TourPlannerConfig.csproj" />
     <ProjectReference Include="..\TourPlannerDAL\TourPlannerDAL.csproj" />
+    <ProjectReference Include="..\TourPlannerLogging\TourPlannerLogging.csproj" />
   </ItemGroup>
 
   <ItemGroup>

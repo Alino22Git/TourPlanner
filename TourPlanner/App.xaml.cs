@@ -57,6 +57,8 @@ namespace TourPlanner
             services.AddTransient<TourViewModel>();
             services.AddTransient<TourLogViewModel>();
             services.AddTransient<RouteDataManager>();
+            services.AddTransient<ReportManager>();
+            services.AddTransient<FileTransferManager>();
             services.AddTransient<MainWindow>(provider => {
                 var mainViewModel = provider.GetRequiredService<MainViewModel>();
                 return new MainWindow(mainViewModel);
@@ -69,7 +71,9 @@ namespace TourPlanner
                 var geocodeService = provider.GetRequiredService<GeocodeService>();
                 var directionService = provider.GetRequiredService<DirectionService>();
                 var routeDataManager = provider.GetRequiredService<RouteDataManager>();
-                return new MainViewModel(contentControl, tourService, tourLogService, routeDataManager);
+                var reportManager = provider.GetRequiredService<ReportManager>();
+                var fileTransferManager = provider.GetRequiredService<FileTransferManager>();
+                return new MainViewModel(contentControl, tourService, tourLogService, routeDataManager, reportManager, fileTransferManager);
             });
         }
     }

@@ -68,7 +68,7 @@ namespace TourPlanner.ViewModels
             DeleteTourCommand = new RelayCommand(async (parameter) => await DeleteSelectedTour(parameter));
         }
 
-        private async void LoadTours()
+        public async void LoadTours()
         {
             var toursFromDb = await _tourService.GetToursAsync();
             Tours = new ObservableCollection<Tour>(toursFromDb);
@@ -91,8 +91,8 @@ namespace TourPlanner.ViewModels
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Error getting distance and time for tour {originalTour.Name}: {ex.Message}");
-                    distance = null; // Set to null if distance couldn't be fetched
-                    time = null; // Set to null if time couldn't be fetched
+                    distance = null; 
+                    time = null;
                 }
             }
 
@@ -164,8 +164,8 @@ namespace TourPlanner.ViewModels
                             catch (Exception ex)
                             {
                                 Debug.WriteLine($"Error getting distance and time for existing tour: {ex.Message}");
-                                OriginalTour.Distance = null; // Set to null if distance couldn't be fetched
-                                OriginalTour.Time = null; // Set to null if time couldn't be fetched
+                                OriginalTour.Distance = null;
+                                OriginalTour.Time = null;
                             }
                         }
                         await _tourService.UpdateTourAsync(OriginalTour);

@@ -7,11 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="itext7" Version="7.2.4" />
+    <PackageReference Include="log4net" Version="2.0.17" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2478.35" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TourPlannerDAL\TourPlannerDAL.csproj" />
+    <ProjectReference Include="..\TourPlannerLogging\TourPlannerLogging.csproj" />
   </ItemGroup>
 
 </Project>

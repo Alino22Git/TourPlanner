@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TourPlannerDAL;
@@ -11,9 +12,11 @@ using TourPlannerDAL;
 namespace TourPlannerDAL.Migrations
 {
     [DbContext(typeof(TourPlannerDbContext))]
-    partial class TourPlannerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240527165656_Popularity")]
+    partial class Popularity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,10 +32,6 @@ namespace TourPlannerDAL.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ChildFriendliness")
-                        .HasMaxLength(500)
-                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)

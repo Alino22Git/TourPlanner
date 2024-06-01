@@ -15,6 +15,7 @@ namespace TourPlanner.Viewmodels
     public class TourLogViewModel : INotifyPropertyChanged
     {
         private readonly TourLogService _tourLogService;
+        private readonly TourService _tourService;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -122,8 +123,6 @@ namespace TourPlanner.Viewmodels
             }
         }
 
-        
-
         private ObservableCollection<TourLog>? tourLogs;
         public ObservableCollection<TourLog>? TourLogs
         {
@@ -152,11 +151,13 @@ namespace TourPlanner.Viewmodels
 
         private TourViewModel tourViewModel;
 
-        public TourLogViewModel(TourViewModel tourViewModel, TourLogService tourLogService){
+        public TourLogViewModel(TourViewModel tourViewModel, TourLogService tourLogService, TourService tourService)
+        {
             this.tourViewModel = tourViewModel;
             this._tourLogService = tourLogService;
+            this._tourService = tourService;
             SaveTourLogCommand = new RelayCommand(async (parameter) => await SaveTourLog(parameter));
-            DeleteTourLogCommand = new RelayCommand(DeleteSelectedTourLog);
+            DeleteTourLogCommand = new RelayCommand(async (parameter) => await DeleteSelectedTourLog(parameter));
             InitializeWeatherOptions();
         }
 
@@ -174,26 +175,31 @@ namespace TourPlanner.Viewmodels
 
         private async void UpdateTourLogs()
         {
-            if (SelectedTour != null){
+            if (SelectedTour != null)
+            {
                 var logs = await _tourLogService.GetTourLogsByTourIdAsync(SelectedTour.Id);
                 TourLogs = new ObservableCollection<TourLog>(logs);
             }
-            else{
+            else
+            {
                 TourLogs?.Clear();
             }
         }
 
         private async Task SaveTourLog(object? parameter)
         {
-            if (SelectedTour == null){
+            if (SelectedTour == null)
+            {
                 return;
             }
 
             var selectedWeatherOptions = WeatherOptions.Where(w => w.IsChecked).Select(w => w.Name).ToList();
             var selectedWeather = string.Join(", ", selectedWeatherOptions);
 
-            if (SelectedTourLog == null){
-                var newTourLog = new TourLog{
+            if (SelectedTourLog == null)
+            {
+                var newTourLog = new TourLog
+                {
                     Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null,
                     Comment = SelectedComment,
                     Difficulty = SelectedDifficulty,
@@ -201,17 +207,19 @@ namespace TourPlanner.Viewmodels
                     TotalTime = SelectedTotalTime,
                     Weather = selectedWeather,
                     Rating = SelectedRating,
-                    TourId = SelectedTour.Id 
+                    TourId = SelectedTour.Id
                 };
 
                 await _tourLogService.AddTourLogAsync(newTourLog);
                 SelectedTour.TourLogs.Add(newTourLog);
+                await _tourService.UpdateTourAsync(SelectedTour); 
             }
             else
             {
                 var tourLogToUpdate = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
 
-                if (tourLogToUpdate != null){
+                if (tourLogToUpdate != null)
+                {
                     tourLogToUpdate.Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null;
                     tourLogToUpdate.Comment = SelectedComment;
                     tourLogToUpdate.Difficulty = SelectedDifficulty;
@@ -220,6 +228,7 @@ namespace TourPlanner.Viewmodels
                     tourLogToUpdate.Weather = selectedWeather;
                     tourLogToUpdate.Rating = SelectedRating;
                     await _tourLogService.UpdateTourLogAsync(tourLogToUpdate);
+                    await _tourService.UpdateTourAsync(SelectedTour); 
                 }
             }
 
@@ -231,17 +240,20 @@ namespace TourPlanner.Viewmodels
             UpdateTourLogs();
         }
 
-        public void DeleteSelectedTourLog(object? parameter)
+        public async Task DeleteSelectedTourLog(object? parameter)
         {
-            if (SelectedTour == null || SelectedTourLog == null){
+            if (SelectedTour == null || SelectedTourLog == null)
+            {
                 return;
             }
             var tourLogToDelete = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
 
-            if (tourLogToDelete != null){
+            if (tourLogToDelete != null)
+            {
                 SelectedTour.TourLogs.Remove(tourLogToDelete);
-                _tourLogService.DeleteTourLogAsync(tourLogToDelete);
+                await _tourLogService.DeleteTourLogAsync(tourLogToDelete);
                 OnPropertyChanged(nameof(TourLogs));
+                await _tourService.UpdateTourAsync(SelectedTour); 
             }
             SelectedTourLog = null;
             UpdateTourLogs();
@@ -253,19 +265,22 @@ namespace TourPlanner.Viewmodels
             }
         }
 
-        private void LoadSelectedTourLogData(){
+        private void LoadSelectedTourLogData()
+        {
             SelectedDate = SelectedTourLog?.Date;
             SelectedComment = SelectedTourLog?.Comment;
             SelectedTotalDistance = SelectedTourLog?.TotalDistance ?? 0;
             SelectedTotalTime = SelectedTourLog?.TotalTime ?? 0;
             SelectedDifficulty = SelectedTourLog?.Difficulty;
 
-            foreach (var option in WeatherOptions){
+            foreach (var option in WeatherOptions)
+            {
                 option.IsChecked = SelectedTourLog?.Weather?.Split(',').Contains(option.Name.Trim()) ?? false;
             }
         }
 
-        protected void OnPropertyChanged(string propertyName){
+        protected void OnPropertyChanged(string propertyName)
+        {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
