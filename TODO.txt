@@ -1,9 +1,0 @@
-Nötiges bis vollständiges Projekt:
-
--Validation
--UI unnötige Elemente löschen
--DAL = ORM + APIs
--Report generation
--Suchfunktion
--Logging
--Configuration file
