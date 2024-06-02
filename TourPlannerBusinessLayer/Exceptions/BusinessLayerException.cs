@@ -50,5 +50,41 @@ namespace TourPlannerBusinessLayer.Exceptions
 
         public GeocodeServiceException(string message, Exception innerException) : base(message, innerException) { }
     }
+
+    public class DirectionsServiceException : BusinessLayerException
+    {
+        public DirectionsServiceException() { }
+
+        public DirectionsServiceException(string message) : base(message) { }
+
+        public DirectionsServiceException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    public class RouteDataManagerException : BusinessLayerException
+    {
+        public RouteDataManagerException() { }
+
+        public RouteDataManagerException(string message) : base(message) { }
+
+        public RouteDataManagerException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    public class ReportManagerException : BusinessLayerException
+    {
+        public ReportManagerException() { }
+
+        public ReportManagerException(string message) : base(message) { }
+
+        public ReportManagerException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    public class FileTransferManagerException : BusinessLayerException
+    {
+        public FileTransferManagerException() { }
+
+        public FileTransferManagerException(string message) : base(message) { }
+
+        public FileTransferManagerException(string message, Exception innerException) : base(message, innerException) { }
+    }
 }
 

@@ -14,6 +14,7 @@ using TourPlanner.Views;
 using TourPlannerBusinessLayer.Managers;
 using TourPlannerBusinessLayer.Service;
 using TourPlannerLogging;
+using TourPlanner.Exceptions;
 
 namespace TourPlanner.ViewModels
 {
@@ -55,6 +56,9 @@ namespace TourPlanner.ViewModels
             }
         }
 
+
+        // Konstruktor initializing needed services and commands
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public MainViewModel(ContentControl dynamicContentControl, TourService tourService, TourLogService tourLogService, RouteDataManager routeDataManager, ReportManager reportManager, FileTransferManager fileTransferManager, DialogManager dialogManager)
         {
             _dynamicContentControl = dynamicContentControl;
@@ -65,6 +69,7 @@ namespace TourPlanner.ViewModels
             TourViewModel = new TourViewModel(tourService, routeDataManager);
             TourLogViewModel = new TourLogViewModel(TourViewModel, tourLogService, tourService);
             _logger.Debug("MainViewModel created");
+
             TourViewModel.PropertyChanged += async (s, e) =>
             {
                 if (e.PropertyName == nameof(TourViewModel.SelectedTour))
@@ -85,27 +90,45 @@ namespace TourPlanner.ViewModels
             ReportGenCommand = new RelayCommand(GenerateReport);
             GenerateReportWithMapScreenshotCommand = new RelayCommand(GenerateReportWithMapScreenshot);
             SummaryReportGenCommand = new RelayCommand(GenerateSummaryReport);
-            
+
             ExportToursCommand = new RelayCommand(async (parameter) =>
             {
-                var fileName = _dialogManager.ShowSaveFileDialog("JSON files (*.json)|*.json|All files (*.*)|*.*", "json", "export.json");
-                if (fileName != null)
+                try
                 {
-                    await fileTransferManager.ExportToursAsync(fileName);
+                    var fileName = _dialogManager.ShowSaveFileDialog("JSON files (*.json)|*.json|All files (*.*)|*.*", "json", "export.json");
+                    if (fileName != null)
+                    {
+                        await fileTransferManager.ExportToursAsync(fileName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"Error exporting tours: {ex.Message}");
+                    throw new SaveException("Error exporting tours", ex);
                 }
             });
 
             ImportToursCommand = new RelayCommand(async (parameter) =>
             {
-                var fileName = _dialogManager.ShowOpenFileDialog("JSON files (*.json)|*.json|All files (*.*)|*.*", "json");
-                if (fileName != null)
+                try
                 {
-                    await fileTransferManager.ImportToursAsync(fileName);
-                    TourViewModel.LoadTours();
+                    var fileName = _dialogManager.ShowOpenFileDialog("JSON files (*.json)|*.json|All files (*.*)|*.*", "json");
+                    if (fileName != null)
+                    {
+                        await fileTransferManager.ImportToursAsync(fileName);
+                        TourViewModel.LoadTours();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"Error importing tours: {ex.Message}");
+                    throw new SaveException("Error importing tours", ex);
                 }
             });
         }
 
+        //Initializes the WebView
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
         private async Task InitializeWebViewAsync(WebView2 webView)
         {
             try
@@ -120,9 +143,12 @@ namespace TourPlanner.ViewModels
             catch (Exception ex)
             {
                 _logger.Error($"Error initializing WebView: {ex.Message}");
+                throw new InitializationException("Error initializing WebView", ex);
             }
         }
 
+        //Updates the WebView
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private async Task UpdateWebViewAsync()
         {
             try
@@ -148,124 +174,216 @@ namespace TourPlanner.ViewModels
             catch (Exception ex)
             {
                 _logger.Error($"Error updating WebView: {ex.Message}");
+                throw new UpdateException("Error updating WebView", ex);
             }
         }
 
+        //Sets the general Content in the MainWindow
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void SetGeneralContentOnListChange(object parameter)
         {
-            if (TourViewModel.SelectedTour != null)
+            try
             {
-                DynamicContentControl.DataContext = TourViewModel;
-                DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
-                DynamicContentControl.Content = TourViewModel.SelectedTour;
-                if (_webView != null)
+                if (TourViewModel.SelectedTour != null)
                 {
-                    _webView.Visibility = Visibility.Visible;
+                    DynamicContentControl.DataContext = TourViewModel;
+                    DynamicContentControl.ContentTemplate = (DataTemplate)Application.Current.MainWindow.FindResource("TourDetailsTemplate");
+                    DynamicContentControl.Content = TourViewModel.SelectedTour;
+                    if (_webView != null)
+                    {
+                        _webView.Visibility = Visibility.Visible;
+                    }
                 }
             }
-        }
-
-        private void SetRouteContent(object parameter)
-        {
-            if (_webView != null)
+            catch (Exception ex)
             {
-                _webView.Visibility = Visibility.Visible;
+                _logger.Error($"Error setting general content on list change: {ex.Message}");
+                throw new UpdateException("Error setting general content on list change", ex);
             }
-            hideWebView = false;
         }
 
+
+        //Opens the AddTourWindow
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void OpenAddTourWindow(object? parameter)
         {
-            TourViewModel.SelectedTour = null;
-            _dialogManager.ShowAddTourWindow(TourViewModel);
+            try
+            {
+                TourViewModel.SelectedTour = null;
+                _dialogManager.ShowAddTourWindow(TourViewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error opening add tour window: {ex.Message}");
+                throw new InitializationException("Error opening add tour window", ex);
+            }
         }
+
+        //Opens the AddTourLogWindow
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void OpenAddTourLogWindow(object? parameter)
         {
-            _dialogManager.ShowAddTourLogWindow(TourLogViewModel);
-        }
-
-        private void ListBoxItemDoubleClick(object parameter)
-        {
-            Debug.WriteLine("ListBoxItemDoubleClick called");
-            if (parameter == null)
-            {
-                Debug.WriteLine("Parameter is null");
-            }
-            else
-            {
-                Debug.WriteLine($"Parameter type: {parameter.GetType()}");
-            }
-
-            if (parameter is Tour selectedTour)
-            {
-                Debug.WriteLine("Parameter is Tour");
-                _dialogManager.ShowEditTourWindow(TourViewModel, selectedTour);
-            }
-            else
-            {
-                Debug.WriteLine("Parameter is not Tour");
-            }
-        }
-
-        private void TourLogMenuItemDoubleClick(object parameter)
-        {
-            if (parameter is TourLog selectedTourLog)
+            try
             {
                 _dialogManager.ShowAddTourLogWindow(TourLogViewModel);
             }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error opening add tour log window: {ex.Message}");
+                throw new InitializationException("Error opening add tour log window", ex);
+            }
         }
 
+        //Shows the EditTourWindow if there is no error
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        private void ListBoxItemDoubleClick(object parameter)
+        {
+            try
+            {
+                Debug.WriteLine("ListBoxItemDoubleClick called");
+                if (parameter == null)
+                {
+                    _logger.Error("Parameter is null");
+                    Debug.WriteLine("Parameter is null");
+                }
+                else
+                {
+                    Debug.WriteLine($"Parameter type: {parameter.GetType()}");
+                }
+
+                if (parameter is Tour selectedTour)
+                {
+                    Debug.WriteLine("Parameter is Tour");
+                    _dialogManager.ShowEditTourWindow(TourViewModel, selectedTour);
+                }
+                else
+                {
+                    Debug.WriteLine("Parameter is not Tour");
+                    _logger.Error("Parameter is not Tour");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error on list box item double click: {ex.Message}");
+                throw new UpdateException("Error on list box item double click", ex);
+            }
+        }
+
+        //Shows the EditTourLogWindow if there is no error
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        private void TourLogMenuItemDoubleClick(object parameter)
+        {
+            try
+            {
+                if (parameter is TourLog selectedTourLog)
+                {
+                    _dialogManager.ShowAddTourLogWindow(TourLogViewModel);
+                }
+                else
+                {
+                    _logger.Error("Parameter is not TourLog");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error on tour log menu item double click: {ex.Message}");
+                throw new UpdateException("Error on tour log menu item double click", ex);
+            }
+        }
+
+        //Sets the general content in the MainWindow when the ListBox selection changes
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public void ListBoxSelectionChanged(object parameter)
         {
-            if (parameter is Tour selectedTour)
+            try
             {
-                TourViewModel.SelectedTour = selectedTour;
-                TourLogViewModel.TourLogs = selectedTour.TourLogs;
-                SetGeneralContentOnListChange(selectedTour);
+                if (parameter is Tour selectedTour)
+                {
+                    TourViewModel.SelectedTour = selectedTour;
+                    TourLogViewModel.TourLogs = selectedTour.TourLogs;
+                    SetGeneralContentOnListChange(selectedTour);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error on list box selection changed: {ex.Message}");
+                throw new UpdateException("Error on list box selection changed", ex);
             }
         }
 
+        //Sets up the report generation
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void GenerateReport(object parameter)
         {
-            if (TourViewModel.SelectedTour != null)
+            try
             {
-                var fileName = _dialogManager.ShowSaveFileDialog("PDF files (*.pdf)|*.pdf|All files (*.*)|*.*", "pdf", $"{TourViewModel.SelectedTour.Name}.pdf");
-                if (fileName != null)
+                if (TourViewModel.SelectedTour != null)
                 {
-                    _reportManager.GenerateReport(TourViewModel.SelectedTour, fileName, _tourService);
+                    var fileName = _dialogManager.ShowSaveFileDialog("PDF files (*.pdf)|*.pdf|All files (*.*)|*.*", "pdf", $"{TourViewModel.SelectedTour.Name}.pdf");
+                    if (fileName != null)
+                    {
+                        _reportManager.GenerateReport(TourViewModel.SelectedTour, fileName, _tourService);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a tour to generate a report.", "No tour selected", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select a tour to generate a report.", "No tour selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                _logger.Error($"Error generating report: {ex.Message}");
+                throw new SaveException("Error generating report", ex);
             }
         }
 
+        //Sets up the report generation with a map screenshot
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void GenerateReportWithMapScreenshot(object parameter)
         {
-            if (TourViewModel.SelectedTour != null)
+            try
             {
-                var fileName = _dialogManager.ShowSaveFileDialog("PDF files (*.pdf)|*.pdf|All files (*.*)|*.*", "pdf", $"{TourViewModel.SelectedTour.Name}.pdf");
-                if (fileName != null)
+                if (TourViewModel.SelectedTour != null)
                 {
-                    _reportManager.GenerateReportWithMapScreenshot(TourViewModel.SelectedTour, fileName, _tourService, _webView);
+                    var fileName = _dialogManager.ShowSaveFileDialog("PDF files (*.pdf)|*.pdf|All files (*.*)|*.*", "pdf", $"{TourViewModel.SelectedTour.Name}.pdf");
+                    if (fileName != null)
+                    {
+                        _reportManager.GenerateReportWithMapScreenshot(TourViewModel.SelectedTour, fileName, _tourService, _webView);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a tour to generate a report.", "No tour selected", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select a tour to generate a report.", "No tour selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                _logger.Error($"Error generating report with map screenshot: {ex.Message}");
+                throw new SaveException("Error generating report with map screenshot", ex);
             }
         }
 
+        //Sets up the summary report generation
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void GenerateSummaryReport(object parameter)
         {
-            var fileName = _dialogManager.ShowSaveFileDialog("PDF files (*.pdf)|*.pdf|All files (*.*)|*.*", "pdf", "SummaryReport.pdf");
-            if (fileName != null)
+            try
             {
-                _reportManager.GenerateSummaryReport(fileName, _tourService);
+                var fileName = _dialogManager.ShowSaveFileDialog("PDF files (*.pdf)|*.pdf|All files (*.*)|*.*", "pdf", "SummaryReport.pdf");
+                if (fileName != null)
+                {
+                    _reportManager.GenerateSummaryReport(fileName, _tourService);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error generating summary report: {ex.Message}");
+                throw new SaveException("Error generating summary report", ex);
             }
         }
 
+        //On Prperty Change method
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

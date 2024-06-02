@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Models;
+using TourPlannerBusinessLayer.Exceptions;
 using TourPlannerBusinessLayer.Service;
 using TourPlannerLogging;
 using System.Diagnostics;
@@ -17,6 +18,7 @@ namespace TourPlannerBusinessLayer.Managers
         public FileTransferManager()
         {
         }
+
         public FileTransferManager(TourService tourService)
         {
             _tourService = tourService;
@@ -39,8 +41,10 @@ namespace TourPlannerBusinessLayer.Managers
             }
             catch (Exception ex)
             {
-                logger.Error($"An error occurred while exporting tours: {ex.Message}");
-                Debug.WriteLine($"An error occurred while exporting tours: {ex.Message}");
+                string errorMsg = $"An error occurred while exporting tours: {ex.Message}";
+                logger.Error(errorMsg);
+                Debug.WriteLine(errorMsg);
+                throw new FileTransferManagerException(errorMsg, ex);
             }
         }
 
@@ -61,13 +65,12 @@ namespace TourPlannerBusinessLayer.Managers
 
                     foreach (var tour in tours)
                     {
-                        // Setze die ID auf 0, damit die Datenbank eine neue ID generiert
                         tour.Id = 0;
 
                         foreach (var log in tour.TourLogs)
                         {
                             log.Id = 0;
-                            log.TourId = 0; // Setze die TourId auf 0, damit die Datenbank eine neue ID generiert
+                            log.TourId = 0; // Set the TourId to 0 so the database generates a new ID
                         }
 
                         await _tourService.AddTourAsync(tour);
@@ -76,8 +79,10 @@ namespace TourPlannerBusinessLayer.Managers
             }
             catch (Exception ex)
             {
-                logger.Error($"An error occurred while importing tours: {ex.Message}");
-                Debug.WriteLine($"An error occurred while importing tours: {ex.Message}");
+                string errorMsg = $"An error occurred while importing tours: {ex.Message}";
+                logger.Error(errorMsg);
+                Debug.WriteLine(errorMsg);
+                throw new FileTransferManagerException(errorMsg, ex);
             }
         }
     }

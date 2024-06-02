@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using TourPlannerLogging;
+using TourPlannerDAL.Exceptions;
+
 namespace TourPlannerDAL
 {
     public class TourLogRepository
@@ -25,7 +28,9 @@ namespace TourPlannerDAL
             }
             catch (Exception e)
             {
-                logger.Error($"Error adding tour log {e.Message}");
+                string errorMsg = $"Error adding tour log: {e.Message}";
+                logger.Error(errorMsg);
+                throw new TourLogRepositoryException(errorMsg, e);
             }
         }
 
@@ -37,8 +42,9 @@ namespace TourPlannerDAL
             }
             catch (Exception e)
             {
-                logger.Error($"Error adding tour log {e.Message}");
-                return new List<TourLog>();
+                string errorMsg = $"Error retrieving tour logs: {e.Message}";
+                logger.Error(errorMsg);
+                throw new TourLogRepositoryException(errorMsg, e);
             }
         }
 
@@ -52,8 +58,9 @@ namespace TourPlannerDAL
             }
             catch (Exception e)
             {
-                logger.Error($"Error adding tour log {e.Message}");
-                return new List<TourLog>();
+                string errorMsg = $"Error retrieving tour logs by tour ID: {e.Message}";
+                logger.Error(errorMsg);
+                throw new TourLogRepositoryException(errorMsg, e);
             }
         }
 
@@ -66,7 +73,9 @@ namespace TourPlannerDAL
             }
             catch (Exception e)
             {
-                logger.Error($"Error adding tour log {e.Message}");
+                string errorMsg = $"Error updating tour log: {e.Message}";
+                logger.Error(errorMsg);
+                throw new TourLogRepositoryException(errorMsg, e);
             }
         }
 
@@ -77,9 +86,11 @@ namespace TourPlannerDAL
                 _dbContext.TourLogs.Remove(tourLog);
                 await _dbContext.SaveChangesAsync();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                logger.Error($"Error adding tour log {e.Message}");
+                string errorMsg = $"Error deleting tour log: {e.Message}";
+                logger.Error(errorMsg);
+                throw new TourLogRepositoryException(errorMsg, e);
             }
         }
     }

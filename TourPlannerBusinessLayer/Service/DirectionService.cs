@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TourPlannerLogging;
+using TourPlannerBusinessLayer.Exceptions;
+
 namespace TourPlannerBusinessLayer.Service
 {
     public class DirectionService
@@ -13,7 +15,6 @@ namespace TourPlannerBusinessLayer.Service
 
         public DirectionService()
         {
-            
         }
 
         public DirectionService(HttpClient httpClient)
@@ -23,7 +24,6 @@ namespace TourPlannerBusinessLayer.Service
 
         public virtual async Task<string> GetDirectionsAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string apiKey, string transportType)
         {
-
             string url;
 
             if (transportType != "Car" && transportType != "Bicycle" && transportType != "Hike")
@@ -37,12 +37,10 @@ namespace TourPlannerBusinessLayer.Service
             else if (transportType == "Hike")
             {
                 url = $"https://api.openrouteservice.org/v2/directions/foot-hiking?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
-
             }
             else if (transportType == "Bicycle")
             {
                 url = $"https://api.openrouteservice.org/v2/directions/cycling-regular?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
-
             }
             else
             {
@@ -55,18 +53,28 @@ namespace TourPlannerBusinessLayer.Service
                 if (!response.IsSuccessStatusCode)
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"Error fetching directions data: {response.StatusCode} - {response.ReasonPhrase} - {errorResponse}");
-                    return null;
+                    string errorMsg = $"Error fetching directions data: {response.StatusCode} - {response.ReasonPhrase} - {errorResponse}";
+                    logger.Error(errorMsg);
+                    Debug.WriteLine(errorMsg);
+                    throw new DirectionsServiceException(errorMsg);
                 }
 
                 string result = await response.Content.ReadAsStringAsync();
                 return result;
             }
+            catch (HttpRequestException ex)
+            {
+                string errorMsg = $"Error fetching directions data: {ex.Message}";
+                logger.Error(errorMsg);
+                Debug.WriteLine(errorMsg);
+                throw new DirectionsServiceException(errorMsg, ex);
+            }
             catch (Exception ex)
             {
-                logger.Error($"Error fetching directions data: {ex.Message}");
-                Debug.WriteLine($"Error fetching directions data: {ex.Message}");
-                return null;
+                string errorMsg = $"Error fetching directions data: {ex.Message}";
+                logger.Error(errorMsg);
+                Debug.WriteLine(errorMsg);
+                throw new DirectionsServiceException(errorMsg, ex);
             }
         }
 
@@ -77,22 +85,22 @@ namespace TourPlannerBusinessLayer.Service
             if (transportType != "Car" && transportType != "Bicycle" && transportType != "Hike")
             {
                 return (null, null);
-            }else if (transportType == "Car")
-            {
-                 url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
             }
-            else if(transportType == "Hike")
+            else if (transportType == "Car")
             {
-                 url = $"https://api.openrouteservice.org/v2/directions/foot-hiking?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
-
-            }else if (transportType == "Bicycle")
+                url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+            }
+            else if (transportType == "Hike")
             {
-                 url = $"https://api.openrouteservice.org/v2/directions/cycling-regular?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
-
+                url = $"https://api.openrouteservice.org/v2/directions/foot-hiking?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+            }
+            else if (transportType == "Bicycle")
+            {
+                url = $"https://api.openrouteservice.org/v2/directions/cycling-regular?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
             }
             else
             {
-                 url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+                url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={apiKey}&start={startLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{startLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}&end={endLongitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{endLatitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
             }
 
             try
@@ -101,8 +109,10 @@ namespace TourPlannerBusinessLayer.Service
                 if (!response.IsSuccessStatusCode)
                 {
                     string errorResponse = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"Error fetching directions data: {response.StatusCode} - {response.ReasonPhrase} - {errorResponse}");
-                    return (null, null);
+                    string errorMsg = $"Error fetching directions data: {response.StatusCode} - {response.ReasonPhrase} - {errorResponse}";
+                    logger.Error(errorMsg);
+                    Debug.WriteLine(errorMsg);
+                    throw new DirectionsServiceException(errorMsg);
                 }
 
                 string result = await response.Content.ReadAsStringAsync();
@@ -132,13 +142,27 @@ namespace TourPlannerBusinessLayer.Service
 
                 return (null, null);
             }
+            catch (JsonException ex)
+            {
+                string errorMsg = $"Error parsing directions data: {ex.Message}";
+                logger.Error(errorMsg);
+                Debug.WriteLine(errorMsg);
+                throw new DirectionsServiceException(errorMsg, ex);
+            }
+            catch (HttpRequestException ex)
+            {
+                string errorMsg = $"Error fetching directions data: {ex.Message}";
+                logger.Error(errorMsg);
+                Debug.WriteLine(errorMsg);
+                throw new DirectionsServiceException(errorMsg, ex);
+            }
             catch (Exception ex)
             {
-                logger.Error($"Error fetching directions data: {ex.Message}");
-                Debug.WriteLine($"Error fetching directions data: {ex.Message}");
-                return (null, null);
+                string errorMsg = $"Error fetching directions data: {ex.Message}";
+                logger.Error(errorMsg);
+                Debug.WriteLine(errorMsg);
+                throw new DirectionsServiceException(errorMsg, ex);
             }
         }
-
     }
 }

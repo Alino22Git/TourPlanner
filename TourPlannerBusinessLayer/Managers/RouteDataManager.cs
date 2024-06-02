@@ -1,8 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.IO;
 using System.Threading.Tasks;
+using TourPlannerBusinessLayer.Exceptions;
 using TourPlannerBusinessLayer.Service;
 using TourPlannerLogging;
+
 namespace TourPlannerBusinessLayer.Managers
 {
     public class RouteDataManager
@@ -14,8 +17,8 @@ namespace TourPlannerBusinessLayer.Managers
 
         public RouteDataManager()
         {
-
         }
+
         public RouteDataManager(GeocodeService geocodeService, DirectionService directionService, IConfiguration configuration)
         {
             _geocodeService = geocodeService;
@@ -25,29 +28,52 @@ namespace TourPlannerBusinessLayer.Managers
 
         public virtual async Task<(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string directions)> GetTourDataAsync(string from, string to, string transportType)
         {
-            try {
+            try
+            {
                 var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from, _apiKey);
                 var (endLongitude, endLatitude) = await _geocodeService.GetCoordinatesAsync(to, _apiKey);
                 string directions = await _directionService.GetDirectionsAsync(startLongitude, startLatitude, endLongitude, endLatitude, _apiKey, transportType);
                 return (startLongitude, startLatitude, endLongitude, endLatitude, directions);
             }
+            catch (GeocodeServiceException ex)
+            {
+                string errorMsg = $"Error retrieving coordinates: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
+            }
+            catch (DirectionsServiceException ex)
+            {
+                string errorMsg = $"Error retrieving directions: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
+            }
             catch (Exception ex)
             {
-                logger.Error($"Error retireving tour Data {ex.Message}");
-                return (0, 0, 0, 0, "");
+                string errorMsg = $"Unexpected error retrieving tour data: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
             }
         }
 
         public async Task SaveDirectionsToFileAsync(string directions, string filePath)
         {
             try
-            { 
+            {
                 string jsContent = $"const directions = {directions};";
                 await File.WriteAllTextAsync(filePath, jsContent);
                 logger.Info($"Directions saved to file {filePath}");
-            } catch (Exception ex)
+            }
+            catch (IOException ex)
             {
-                logger.Error($"Error saving directions to file {ex.Message}");
+                string errorMsg = $"Error saving directions to file: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = $"Unexpected error saving directions to file: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
             }
         }
 
@@ -60,10 +86,17 @@ namespace TourPlannerBusinessLayer.Managers
                 Directory.CreateDirectory(resourceDir);
                 return Path.Combine(resourceDir, relativePath);
             }
+            catch (IOException ex)
+            {
+                string errorMsg = $"Error creating resource directory: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
+            }
             catch (Exception ex)
             {
-                logger.Error($"Error getting project resource path {ex.Message}");
-                return "";
+                string errorMsg = $"Unexpected error getting project resource path: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
             }
         }
 
@@ -76,10 +109,23 @@ namespace TourPlannerBusinessLayer.Managers
                 var (distance, duration) = await _directionService.GetRouteDistanceAndDurationAsync(startLongitude, startLatitude, endLongitude, endLatitude, transportType, _apiKey);
                 return (distance, duration);
             }
+            catch (GeocodeServiceException ex)
+            {
+                string errorMsg = $"Error retrieving coordinates: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
+            }
+            catch (DirectionsServiceException ex)
+            {
+                string errorMsg = $"Error retrieving distance and duration: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
+            }
             catch (Exception ex)
             {
-                logger.Error($"Error getting distance and duration {ex.Message}");
-                return ("", "");
+                string errorMsg = $"Unexpected error retrieving distance and duration: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new RouteDataManagerException(errorMsg, ex);
             }
         }
     }

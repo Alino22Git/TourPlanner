@@ -48,7 +48,6 @@ namespace Models
             get => TourLogs.Count;
             set
             {
-                // Der Setter bleibt leer, weil Popularity basierend auf TourLogs berechnet wird
                 OnPropertyChanged(nameof(Popularity));
             }
         }
@@ -172,21 +171,27 @@ namespace Models
             get
             {
                 double totalDifficulty = 0;
+                double maxDifficulty = 0;
+
                 foreach (TourLog tourLog in TourLogs)
                 {
                     switch (tourLog.Difficulty)
                     {
                         case "Easy":
                             totalDifficulty += 1;
+                            maxDifficulty += 1;
                             break;
                         case "Moderate":
                             totalDifficulty += 2;
+                            maxDifficulty += 2;
                             break;
                         case "Hard":
                             totalDifficulty += 3;
+                            maxDifficulty += 3;
                             break;
                         case "Extreme":
                             totalDifficulty += 4;
+                            maxDifficulty += 4;
                             break;
                     }
                 }
@@ -196,29 +201,37 @@ namespace Models
                     return 0;
                 }
 
-                // Entfernen Sie die Einheit aus der Distanz- und Zeit-Strings
                 string distanceString = Distance.Replace(" km", string.Empty).Trim();
                 string timeString = Time.Replace(" h", string.Empty).Trim();
 
-                // Versuchen Sie, die bereinigten Strings mit der deutschen Kultur zu parsen
                 CultureInfo germanCulture = new CultureInfo("de-DE");
 
                 if (!double.TryParse(distanceString, NumberStyles.Float, germanCulture, out double distanceValue))
                 {
-                    // Wenn das Parsen fehlschlägt, geben Sie eine Fehlermeldung aus
                     Console.WriteLine($"Fehler beim Parsen der Distanz: {Distance}");
                     return 0;
                 }
 
                 if (!double.TryParse(timeString, NumberStyles.Float, germanCulture, out double timeValue))
                 {
-                    // Wenn das Parsen fehlschlägt, geben Sie eine Fehlermeldung aus
                     Console.WriteLine($"Fehler beim Parsen der Zeit: {Time}");
                     return 0;
                 }
 
-                int result = (int)(100000000 / (totalDifficulty * timeValue * distanceValue));
-                // Berechnung der ChildFriendliness
+                // Calculate normalized difficulty
+                double normalizedDifficulty = totalDifficulty / maxDifficulty;
+
+                // Use logarithmic scale to normalize time and distance
+                double normalizedTime = Math.Log(timeValue + 1);
+                double normalizedDistance = Math.Log(distanceValue + 1);
+
+                // Calculate friendliness
+                double friendliness = (1 - normalizedDifficulty) * 0.5 + (1 / (1 + normalizedTime)) * 0.25 + (1 / (1 + normalizedDistance)) * 0.25;
+                int result = (int)(friendliness * 100);
+
+                // Check if result is in valid range
+                result = result % 100;
+
                 return result;
             }
             set
@@ -226,7 +239,6 @@ namespace Models
                 OnPropertyChanged(nameof(Popularity));
             }
         }
-
 
         protected void OnPropertyChanged(string propertyName)
         {

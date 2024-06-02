@@ -9,6 +9,9 @@ using Models;
 using TourPlanner.ViewModels;
 using TourPlanner.Views;
 using TourPlannerBusinessLayer.Service;
+using TourPlannerBusinessLayer.Exceptions;
+using TourPlannerLogging;
+using TourPlanner.Exceptions;
 
 namespace TourPlanner.Viewmodels
 {
@@ -16,6 +19,7 @@ namespace TourPlanner.Viewmodels
     {
         private readonly TourLogService _tourLogService;
         private readonly TourService _tourService;
+        private static readonly ILoggerWrapper _logger = LoggerFactory.GetLogger();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -151,6 +155,8 @@ namespace TourPlanner.Viewmodels
 
         private TourViewModel tourViewModel;
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public TourLogViewModel(TourViewModel tourViewModel, TourLogService tourLogService, TourService tourService)
         {
             this.tourViewModel = tourViewModel;
@@ -161,6 +167,8 @@ namespace TourPlanner.Viewmodels
             InitializeWeatherOptions();
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void InitializeWeatherOptions()
         {
             WeatherOptions = new ObservableCollection<WeatherOption>
@@ -173,12 +181,23 @@ namespace TourPlanner.Viewmodels
             };
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private async void UpdateTourLogs()
         {
             if (SelectedTour != null)
             {
-                var logs = await _tourLogService.GetTourLogsByTourIdAsync(SelectedTour.Id);
-                TourLogs = new ObservableCollection<TourLog>(logs);
+                try
+                {
+                    var logs = await _tourLogService.GetTourLogsByTourIdAsync(SelectedTour.Id);
+                    TourLogs = new ObservableCollection<TourLog>(logs);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"Error updating tour logs: {ex.Message}");
+                    MessageBox.Show($"Error updating tour logs: {ex.Message}");
+                    throw new UpdateException("Error updating tour logs", ex);
+                }
             }
             else
             {
@@ -186,6 +205,8 @@ namespace TourPlanner.Viewmodels
             }
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private async Task SaveTourLog(object? parameter)
         {
             if (SelectedTour == null)
@@ -196,89 +217,123 @@ namespace TourPlanner.Viewmodels
             var selectedWeatherOptions = WeatherOptions.Where(w => w.IsChecked).Select(w => w.Name).ToList();
             var selectedWeather = string.Join(", ", selectedWeatherOptions);
 
-            if (SelectedTourLog == null)
+            try
             {
-                var newTourLog = new TourLog
+                if (SelectedTourLog == null)
                 {
-                    Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null,
-                    Comment = SelectedComment,
-                    Difficulty = SelectedDifficulty,
-                    TotalDistance = SelectedTotalDistance,
-                    TotalTime = SelectedTotalTime,
-                    Weather = selectedWeather,
-                    Rating = SelectedRating,
-                    TourId = SelectedTour.Id
-                };
+                    var newTourLog = new TourLog
+                    {
+                        Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null,
+                        Comment = SelectedComment,
+                        Difficulty = SelectedDifficulty,
+                        TotalDistance = SelectedTotalDistance,
+                        TotalTime = SelectedTotalTime,
+                        Weather = selectedWeather,
+                        Rating = SelectedRating,
+                        TourId = SelectedTour.Id
+                    };
 
-                await _tourLogService.AddTourLogAsync(newTourLog);
-                SelectedTour.TourLogs.Add(newTourLog);
-                await _tourService.UpdateTourAsync(SelectedTour); 
-            }
-            else
-            {
-                var tourLogToUpdate = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
-
-                if (tourLogToUpdate != null)
-                {
-                    tourLogToUpdate.Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null;
-                    tourLogToUpdate.Comment = SelectedComment;
-                    tourLogToUpdate.Difficulty = SelectedDifficulty;
-                    tourLogToUpdate.TotalDistance = SelectedTotalDistance;
-                    tourLogToUpdate.TotalTime = SelectedTotalTime;
-                    tourLogToUpdate.Weather = selectedWeather;
-                    tourLogToUpdate.Rating = SelectedRating;
-                    await _tourLogService.UpdateTourLogAsync(tourLogToUpdate);
-                    await _tourService.UpdateTourAsync(SelectedTour); 
+                    await _tourLogService.AddTourLogAsync(newTourLog);
+                    SelectedTour.TourLogs.Add(newTourLog);
+                    await _tourService.UpdateTourAsync(SelectedTour);
                 }
-            }
+                else
+                {
+                    var tourLogToUpdate = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
 
-            if (parameter is Window window)
-            {
-                window.DialogResult = true;
-                window.Close();
+                    if (tourLogToUpdate != null)
+                    {
+                        tourLogToUpdate.Date = SelectedDate.HasValue ? DateTime.SpecifyKind(SelectedDate.Value, DateTimeKind.Utc) : (DateTime?)null;
+                        tourLogToUpdate.Comment = SelectedComment;
+                        tourLogToUpdate.Difficulty = SelectedDifficulty;
+                        tourLogToUpdate.TotalDistance = SelectedTotalDistance;
+                        tourLogToUpdate.TotalTime = SelectedTotalTime;
+                        tourLogToUpdate.Weather = selectedWeather;
+                        tourLogToUpdate.Rating = SelectedRating;
+                        await _tourLogService.UpdateTourLogAsync(tourLogToUpdate);
+                        await _tourService.UpdateTourAsync(SelectedTour);
+                    }
+                }
+
+                if (parameter is Window window)
+                {
+                    window.DialogResult = true;
+                    window.Close();
+                }
+                UpdateTourLogs();
             }
-            UpdateTourLogs();
+            catch (Exception ex)
+            {
+                _logger.Error($"Error saving tour log: {ex.Message}");
+                MessageBox.Show($"Error saving tour log: {ex.Message}");
+                throw new SaveException("Error saving tour log", ex);
+            }
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public async Task DeleteSelectedTourLog(object? parameter)
         {
             if (SelectedTour == null || SelectedTourLog == null)
             {
                 return;
             }
-            var tourLogToDelete = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
 
-            if (tourLogToDelete != null)
+            try
             {
-                SelectedTour.TourLogs.Remove(tourLogToDelete);
-                await _tourLogService.DeleteTourLogAsync(tourLogToDelete);
-                OnPropertyChanged(nameof(TourLogs));
-                await _tourService.UpdateTourAsync(SelectedTour); 
+                var tourLogToDelete = SelectedTour.TourLogs.FirstOrDefault(tl => tl.Id == SelectedTourLog.Id);
+
+                if (tourLogToDelete != null)
+                {
+                    SelectedTour.TourLogs.Remove(tourLogToDelete);
+                    await _tourLogService.DeleteTourLogAsync(tourLogToDelete);
+                    OnPropertyChanged(nameof(TourLogs));
+                    await _tourService.UpdateTourAsync(SelectedTour);
+                }
+                SelectedTourLog = null;
+                UpdateTourLogs();
+                OnPropertyChanged(nameof(SelectedTourLog));
+                if (parameter is Window window)
+                {
+                    window.DialogResult = true;
+                    window.Close();
+                }
             }
-            SelectedTourLog = null;
-            UpdateTourLogs();
-            OnPropertyChanged(nameof(SelectedTourLog));
-            if (parameter is Window window)
+            catch (Exception ex)
             {
-                window.DialogResult = true;
-                window.Close();
+                _logger.Error($"Error deleting tour log: {ex.Message}");
+                MessageBox.Show($"Error deleting tour log: {ex.Message}");
+                throw new DeleteException("Error deleting tour log", ex);
             }
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void LoadSelectedTourLogData()
         {
-            SelectedDate = SelectedTourLog?.Date;
-            SelectedComment = SelectedTourLog?.Comment;
-            SelectedTotalDistance = SelectedTourLog?.TotalDistance ?? 0;
-            SelectedTotalTime = SelectedTourLog?.TotalTime ?? 0;
-            SelectedDifficulty = SelectedTourLog?.Difficulty;
-
-            foreach (var option in WeatherOptions)
+            try
             {
-                option.IsChecked = SelectedTourLog?.Weather?.Split(',').Contains(option.Name.Trim()) ?? false;
+                SelectedDate = SelectedTourLog?.Date;
+                SelectedComment = SelectedTourLog?.Comment;
+                SelectedTotalDistance = SelectedTourLog?.TotalDistance ?? 0;
+                SelectedTotalTime = SelectedTourLog?.TotalTime ?? 0;
+                SelectedDifficulty = SelectedTourLog?.Difficulty;
+
+                foreach (var option in WeatherOptions)
+                {
+                    option.IsChecked = SelectedTourLog?.Weather?.Split(',').Contains(option.Name.Trim()) ?? false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error loading selected tour log data: {ex.Message}");
+                MessageBox.Show($"Error loading selected tour log data: {ex.Message}");
+                throw new LoadException("Error loading selected tour log data", ex);
             }
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

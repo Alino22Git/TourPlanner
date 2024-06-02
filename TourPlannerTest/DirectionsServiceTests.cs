@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TourPlannerBusinessLayer.Service;
+using TourPlannerBusinessLayer.Exceptions;
 
 namespace TourPlannerTest
 {
@@ -85,7 +86,7 @@ namespace TourPlannerTest
         }
 
         [Test]
-        public async Task GetDirectionsAsync_ShouldReturnNull_ForUnsuccessfulResponse()
+        public void GetDirectionsAsync_ShouldThrowDirectionsServiceException_ForUnsuccessfulResponse()
         {
             // Arrange
             _mockHttpMessageHandler.Setup(m => m.SendAsyncPublic(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
@@ -95,31 +96,30 @@ namespace TourPlannerTest
                     Content = new StringContent("Bad Request")
                 });
 
-            // Act
-            var result = await _directionService.GetDirectionsAsync(16.3738, 48.2082, 16.3738, 48.2082, "test-api-key", "Car");
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<DirectionsServiceException>(async () =>
+                await _directionService.GetDirectionsAsync(16.3738, 48.2082, 16.3738, 48.2082, "test-api-key", "Car"));
 
-            // Assert
-            Assert.IsNull(result);
+            Assert.That(ex.Message, Is.EqualTo("Error fetching directions data: Error fetching directions data: BadRequest - Bad Request - Bad Request"));
         }
 
         [Test]
-        public async Task GetRouteDistanceAndDurationAsync_ShouldReturnNull_ForUnsuccessfulResponse()
+        public void GetRouteDistanceAndDurationAsync_ShouldThrowDirectionsServiceException_ForUnsuccessfulResponse()
         {
             // Arrange
             _mockHttpMessageHandler.Setup(m => m.SendAsyncPublic(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.BadRequest,
-                    Content = new StringContent("Bad Request")
+                    Content = new StringContent("Error fetching")
                 });
 
-            // Act
-            var (distance, duration) = await _directionService.GetRouteDistanceAndDurationAsync(16.3738, 48.2082, 16.3738, 48.2082, "Car", "test-api-key");
-
-            // Assert
-            Assert.IsNull(distance);
-            Assert.IsNull(duration);
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<DirectionsServiceException>(async () =>
+                await _directionService.GetRouteDistanceAndDurationAsync(16.3738, 48.2082, 16.3738, 48.2082, "Car", "test-api-key"));
+            Assert.That(ex.Message, Is.EqualTo("Error fetching directions data: Error fetching directions data: BadRequest - Bad Request - Error fetching"));
         }
+
 
         public class MockableHttpMessageHandler : HttpMessageHandler
         {
