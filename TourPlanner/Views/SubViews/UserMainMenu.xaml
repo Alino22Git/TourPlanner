@@ -7,9 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Menu Foreground="White" Background="#FF312929">
-        <MenuItem Header="File" Padding="10,2"/>
-        <MenuItem Header="Edit" Padding="10,2"/>
-        <MenuItem Header="Options" Padding="10,2"/>
-        <MenuItem Header="Help" Padding="10,2"/>
+        <MenuItem Header="File" Padding="10,2">
+            <MenuItem Header="Export Tours" Command="{Binding ExportToursCommand}" Padding="10,2" Foreground="White" Background="#FF312929" />
+            <MenuItem Header="Import Tours" Command="{Binding ImportToursCommand}" Padding="10,2" Foreground="White" Background="#FF312929" />
+        </MenuItem>
     </Menu>
 </UserControl>
