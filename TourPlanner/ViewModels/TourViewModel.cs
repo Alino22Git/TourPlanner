@@ -11,6 +11,7 @@ using TourPlanner.Views;
 using TourPlannerBusinessLayer.Managers;
 using TourPlannerBusinessLayer.Service;
 using TourPlannerBusinessLayer.Exceptions;
+using TourPlannerLogging;
 
 namespace TourPlanner.ViewModels
 {
@@ -18,7 +19,7 @@ namespace TourPlanner.ViewModels
     {
         private readonly TourService _tourService;
         private readonly RouteDataManager _routeDataManager;
-
+        private static readonly ILoggerWrapper _logger = LoggerFactory.GetLogger();
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public ICommand SaveTourCommand { get; }
@@ -78,14 +79,14 @@ namespace TourPlanner.ViewModels
             }
             catch (TourServiceException ex)
             {
-                // Log the exception or show a message to the user
                 MessageBox.Show($"Error loading tours: {ex.Message}");
+                _logger.LogError($"Error loading tours: {ex.Message}");
                 Debug.WriteLine($"Error loading tours: {ex.Message}");
             }
             catch (Exception ex)
             {
-                // Catch any other exceptions that may occur
                 MessageBox.Show($"An unexpected error occurred: {ex.Message}");
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
                 Debug.WriteLine($"An unexpected error occurred: {ex.Message}");
             }
         }

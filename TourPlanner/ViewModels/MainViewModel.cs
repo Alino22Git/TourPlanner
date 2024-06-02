@@ -25,7 +25,7 @@ namespace TourPlanner.ViewModels
         private readonly ReportManager _reportManager;
         private readonly TourService _tourService;
         private readonly DialogManager _dialogManager;
-        private static readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
+        private static readonly ILoggerWrapper _logger = LoggerFactory.GetLogger();
 
         public TourViewModel TourViewModel { get; }
         public TourLogViewModel TourLogViewModel { get; }
@@ -64,7 +64,7 @@ namespace TourPlanner.ViewModels
             _dialogManager = dialogManager;
             TourViewModel = new TourViewModel(tourService, routeDataManager);
             TourLogViewModel = new TourLogViewModel(TourViewModel, tourLogService, tourService);
-            logger.Debug("MainViewModel created");
+            _logger.Debug("MainViewModel created");
             TourViewModel.PropertyChanged += async (s, e) =>
             {
                 if (e.PropertyName == nameof(TourViewModel.SelectedTour))
@@ -119,7 +119,7 @@ namespace TourPlanner.ViewModels
             }
             catch (Exception ex)
             {
-                logger.Error($"Error initializing WebView: {ex.Message}");
+                _logger.Error($"Error initializing WebView: {ex.Message}");
             }
         }
 
@@ -147,7 +147,7 @@ namespace TourPlanner.ViewModels
             }
             catch (Exception ex)
             {
-                logger.Error($"Error updating WebView: {ex.Message}");
+                _logger.Error($"Error updating WebView: {ex.Message}");
             }
         }
 
