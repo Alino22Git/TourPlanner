@@ -13,7 +13,6 @@ namespace TourPlanner.Views
             if (mainViewModel.InitializeWebViewCommand.CanExecute(webView))
             {
                 mainViewModel.InitializeWebViewCommand.Execute(webView);
-                webView.Visibility = Visibility.Collapsed;
             }
         }
     }

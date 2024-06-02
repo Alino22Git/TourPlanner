@@ -8,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Web.WebView2.Wpf;
-using Microsoft.Win32;
 using Models;
 using TourPlanner.Viewmodels;
 using TourPlanner.Views;
@@ -25,6 +24,7 @@ namespace TourPlanner.ViewModels
         private readonly RouteDataManager _routeDataManager;
         private readonly ReportManager _reportManager;
         private readonly TourService _tourService;
+        private readonly DialogManager _dialogManager;
         private static readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
 
         public TourViewModel TourViewModel { get; }
@@ -33,12 +33,9 @@ namespace TourPlanner.ViewModels
         public ICommand OpenAddTourWindowCommand { get; }
         public ICommand OpenAddTourLogWindowCommand { get; }
         public ICommand InitializeWebViewCommand { get; }
-
-
         public ICommand ListBoxItemDoubleClickCommand { get; }
         public ICommand TourLogMenuItemDoubleClickCommand { get; }
         public ICommand ListBoxSelectionChangedCommand { get; }
-
         public ICommand ReportGenCommand { get; }
         public ICommand SummaryReportGenCommand { get; }
         public ICommand GenerateReportWithMapScreenshotCommand { get; }
@@ -58,12 +55,13 @@ namespace TourPlanner.ViewModels
             }
         }
 
-        public MainViewModel(ContentControl dynamicContentControl, TourService tourService, TourLogService tourLogService, RouteDataManager routeDataManager, ReportManager reportManager, FileTransferManager fileTransferManager)
+        public MainViewModel(ContentControl dynamicContentControl, TourService tourService, TourLogService tourLogService, RouteDataManager routeDataManager, ReportManager reportManager, FileTransferManager fileTransferManager, DialogManager dialogManager)
         {
             _dynamicContentControl = dynamicContentControl;
             _routeDataManager = routeDataManager;
             _reportManager = reportManager;
             _tourService = tourService;
+            _dialogManager = dialogManager;
             TourViewModel = new TourViewModel(tourService, routeDataManager);
             TourLogViewModel = new TourLogViewModel(TourViewModel, tourLogService, tourService);
             logger.Debug("MainViewModel created");
@@ -85,41 +83,25 @@ namespace TourPlanner.ViewModels
             TourLogMenuItemDoubleClickCommand = new RelayCommand(TourLogMenuItemDoubleClick);
             ListBoxSelectionChangedCommand = new RelayCommand(ListBoxSelectionChanged);
             ReportGenCommand = new RelayCommand(GenerateReport);
-            GenerateReportWithMapScreenshotCommand = new RelayCommand(async (parameter) =>
-            {
-                if (TourViewModel.SelectedTour != null)
-                {
-                    await reportManager.GenerateReportWithMapScreenshot(TourViewModel.SelectedTour, "C:\\Users\\micha\\Desktop\\report.pdf", tourService, _webView);
-                }
-            });
-            SummaryReportGenCommand = new RelayCommand((parameter) => GenerateSummaryReport("C:\\Users\\micha\\Desktop\\SummaryReport.pdf", _tourService));
-
+            GenerateReportWithMapScreenshotCommand = new RelayCommand(GenerateReportWithMapScreenshot);
+            SummaryReportGenCommand = new RelayCommand(GenerateSummaryReport);
+            
             ExportToursCommand = new RelayCommand(async (parameter) =>
             {
-                var dialog = new SaveFileDialog
+                var fileName = _dialogManager.ShowSaveFileDialog("JSON files (*.json)|*.json|All files (*.*)|*.*", "json", "export.json");
+                if (fileName != null)
                 {
-                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                    DefaultExt = "json"
-                };
-
-                if (dialog.ShowDialog() == true)
-                {
-                    await fileTransferManager.ExportToursAsync(dialog.FileName);
+                    await fileTransferManager.ExportToursAsync(fileName);
                 }
             });
 
             ImportToursCommand = new RelayCommand(async (parameter) =>
             {
-                var dialog = new OpenFileDialog
+                var fileName = _dialogManager.ShowOpenFileDialog("JSON files (*.json)|*.json|All files (*.*)|*.*", "json");
+                if (fileName != null)
                 {
-                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                    DefaultExt = "json"
-                };
-
-                if (dialog.ShowDialog() == true)
-                {
-                    await fileTransferManager.ImportToursAsync(dialog.FileName);
-                     TourViewModel.LoadTours();
+                    await fileTransferManager.ImportToursAsync(fileName);
+                    TourViewModel.LoadTours();
                 }
             });
         }
@@ -169,8 +151,6 @@ namespace TourPlanner.ViewModels
             }
         }
 
-        
-
         private void SetGeneralContentOnListChange(object parameter)
         {
             if (TourViewModel.SelectedTour != null)
@@ -196,13 +176,12 @@ namespace TourPlanner.ViewModels
 
         private void OpenAddTourWindow(object? parameter)
         {
-            TourViewModel.CreateNewTour(parameter);
+            TourViewModel.SelectedTour = null;
+            _dialogManager.ShowAddTourWindow(TourViewModel);
         }
-
         private void OpenAddTourLogWindow(object? parameter)
         {
-            var addTourLogWindow = new AddTourLogWindow(TourLogViewModel);
-            addTourLogWindow.ShowDialog();
+            _dialogManager.ShowAddTourLogWindow(TourLogViewModel);
         }
 
         private void ListBoxItemDoubleClick(object parameter)
@@ -220,12 +199,7 @@ namespace TourPlanner.ViewModels
             if (parameter is Tour selectedTour)
             {
                 Debug.WriteLine("Parameter is Tour");
-                var addTourWindow = new AddTourWindow(TourViewModel, selectedTour);
-                bool? result = addTourWindow.ShowDialog();
-                if (result == true)
-                {
-                    TourViewModel.OnPropertyChanged(nameof(TourViewModel.Tours));
-                }
+                _dialogManager.ShowEditTourWindow(TourViewModel, selectedTour);
             }
             else
             {
@@ -237,8 +211,7 @@ namespace TourPlanner.ViewModels
         {
             if (parameter is TourLog selectedTourLog)
             {
-                var addTourLogWindow = new AddTourLogWindow(TourLogViewModel);
-                addTourLogWindow.ShowDialog();
+                _dialogManager.ShowAddTourLogWindow(TourLogViewModel);
             }
         }
 
@@ -256,14 +229,33 @@ namespace TourPlanner.ViewModels
         {
             if (TourViewModel.SelectedTour != null)
             {
-                _reportManager.GenerateReport(TourViewModel.SelectedTour, $"C:\\Users\\micha\\Desktop\\{TourViewModel.SelectedTour.Name}.pdf", _tourService);
-
+                var fileName = _dialogManager.ShowSaveFileDialog("PDF files (*.pdf)|*.pdf|All files (*.*)|*.*", "pdf", $"{TourViewModel.SelectedTour.Name}.pdf");
+                if (fileName != null)
+                {
+                    _reportManager.GenerateReport(TourViewModel.SelectedTour, fileName, _tourService);
+                }
             }
         }
 
-        private void GenerateSummaryReport(string destinationPath, TourService tourService)
+        private void GenerateReportWithMapScreenshot(object parameter)
         {
-            _reportManager.GenerateSummaryReport(destinationPath, tourService);
+            if (TourViewModel.SelectedTour != null)
+            {
+                var fileName = _dialogManager.ShowSaveFileDialog("PDF files (*.pdf)|*.pdf|All files (*.*)|*.*", "pdf", $"{TourViewModel.SelectedTour.Name}.pdf");
+                if (fileName != null)
+                {
+                    _reportManager.GenerateReportWithMapScreenshot(TourViewModel.SelectedTour, fileName, _tourService, _webView);
+                }
+            }
+        }
+
+        private void GenerateSummaryReport(object parameter)
+        {
+            var fileName = _dialogManager.ShowSaveFileDialog("PDF files (*.pdf)|*.pdf|All files (*.*)|*.*", "pdf", "SummaryReport.pdf");
+            if (fileName != null)
+            {
+                _reportManager.GenerateSummaryReport(fileName, _tourService);
+            }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -271,5 +263,4 @@ namespace TourPlanner.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
 }
