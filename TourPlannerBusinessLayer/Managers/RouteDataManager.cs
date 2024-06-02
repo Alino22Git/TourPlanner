@@ -23,7 +23,7 @@ namespace TourPlannerBusinessLayer.Managers
             _apiKey = configuration["ApiKeys:OpenRouteService"];
         }
 
-        public async Task<(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string directions)> GetTourDataAsync(string from, string to, string transportType)
+        public virtual async Task<(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string directions)> GetTourDataAsync(string from, string to, string transportType)
         {
             try {
                 var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from, _apiKey);

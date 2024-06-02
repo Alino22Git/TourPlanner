@@ -43,11 +43,15 @@ namespace TourPlannerTest
         [Test]
         public async Task AddTourAsync_ShouldAddTour()
         {
+            //Arrange
             var newTour = new Tour { Name = "New Tour", From = "A", To = "B", TransportType = "Car" };
 
             await _tourService.AddTourAsync(newTour);
 
+            //Act
             var tours = await _tourService.GetToursAsync();
+
+            //Assert
             Assert.AreEqual(1, tours.Count);
             Assert.AreEqual("New Tour", tours[0].Name);
         }
@@ -55,38 +59,49 @@ namespace TourPlannerTest
         [Test]
         public async Task GetToursAsync_ShouldReturnAllTours()
         {
+            //Arrange
             var tour1 = new Tour { Name = "Tour 1", From = "A", To = "B", TransportType = "Car" };
             var tour2 = new Tour { Name = "Tour 2", From = "C", To = "D", TransportType = "Bicycle" };
 
+
+            //Act
             await _tourService.AddTourAsync(tour1);
             await _tourService.AddTourAsync(tour2);
-
             var tours = await _tourService.GetToursAsync();
+
+            //Assert
             Assert.That(tours.Count, Is.EqualTo(2));
         }
 
         [Test]
         public async Task UpdateTourAsync_ShouldUpdateTour()
         {
+            //Arrange
             var tour = new Tour { Name = "Tour", From = "A", To = "B", TransportType = "Car" };
             await _tourService.AddTourAsync(tour);
 
+            //Act
             tour.Name = "Updated Tour";
             await _tourService.UpdateTourAsync(tour);
-
             var tours = await _tourService.GetToursAsync();
+
+            //Assert
             Assert.That(tours[0].Name, Is.EqualTo("Updated Tour"));
         }
 
         [Test]
         public async Task DeleteTourAsync_ShouldRemoveTour()
         {
+            //Arrange
             var tour = new Tour { Name = "Tour", From = "A", To = "B", TransportType = "Car" };
             await _tourService.AddTourAsync(tour);
 
-            await _tourService.DeleteTourAsync(tour);
 
+            //Act
+            await _tourService.DeleteTourAsync(tour);
             var tours = await _tourService.GetToursAsync();
+
+            //Assert
             Assert.That(tours.Count, Is.EqualTo(0));
         }
     }

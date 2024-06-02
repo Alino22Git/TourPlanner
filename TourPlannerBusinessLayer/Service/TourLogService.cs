@@ -9,6 +9,10 @@ namespace TourPlannerBusinessLayer.Service
     {
         private readonly IServiceProvider _serviceProvider;
 
+        public TourLogService()
+        {
+
+        }
         public TourLogService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;

@@ -10,12 +10,17 @@ namespace TourPlannerBusinessLayer.Service
     {
         private readonly HttpClient _httpClient;
 
+        public GeocodeService()
+        {
+           
+        }
+
         public GeocodeService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public async Task<(double, double)> GetCoordinatesAsync(string address, string apiKey)
+        public virtual async Task<(double, double)> GetCoordinatesAsync(string address, string apiKey)
         {
             if (address == null)
             {

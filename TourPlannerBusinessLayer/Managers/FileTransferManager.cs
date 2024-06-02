@@ -13,6 +13,10 @@ namespace TourPlannerBusinessLayer.Managers
     {
         private readonly TourService _tourService;
         private readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
+
+        public FileTransferManager()
+        {
+        }
         public FileTransferManager(TourService tourService)
         {
             _tourService = tourService;

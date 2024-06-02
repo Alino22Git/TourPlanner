@@ -215,7 +215,7 @@ namespace TourPlanner.ViewModels
             }
         }
 
-        private void ListBoxSelectionChanged(object parameter)
+        public void ListBoxSelectionChanged(object parameter)
         {
             if (parameter is Tour selectedTour)
             {

@@ -10,12 +10,18 @@ namespace TourPlannerBusinessLayer.Service
     {
         private readonly HttpClient _httpClient;
         private static readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
+
+        public DirectionService()
+        {
+            
+        }
+
         public DirectionService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public async Task<string> GetDirectionsAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string apiKey, string transportType)
+        public virtual async Task<string> GetDirectionsAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string apiKey, string transportType)
         {
 
             string url;
@@ -64,7 +70,7 @@ namespace TourPlannerBusinessLayer.Service
             }
         }
 
-        public async Task<(string? Distance, string? Duration)> GetRouteDistanceAndDurationAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string transportType, string apiKey)
+        public virtual async Task<(string? Distance, string? Duration)> GetRouteDistanceAndDurationAsync(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string transportType, string apiKey)
         {
             string url;
 

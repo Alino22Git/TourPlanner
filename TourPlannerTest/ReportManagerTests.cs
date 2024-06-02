@@ -8,7 +8,6 @@ using TourPlannerBusinessLayer.Service;
 using Models;
 using Microsoft.Web.WebView2.Core;
 using System.Collections.ObjectModel;
-using TourPlannerBusinessLayer.Wrappers;
 
 namespace TourPlannerTest
 {
@@ -17,13 +16,11 @@ namespace TourPlannerTest
     {
         private ReportManager _reportManager;
         private Mock<TourService> _mockTourService;
-        private Mock<IWebView2Wrapper> _mockWebView2Wrapper;
 
         [SetUp]
         public void SetUp()
         {
             _mockTourService = new Mock<TourService>(MockBehavior.Strict, null);
-            _mockWebView2Wrapper = new Mock<IWebView2Wrapper>();
 
             _reportManager = new ReportManager();
         }
