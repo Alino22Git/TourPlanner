@@ -461,3 +461,6 @@ $RECYCLE.BIN/
 *.dat
 *.lproj
 *.dSYM/
+
+appsettings.json
+"appsettings.json" 
