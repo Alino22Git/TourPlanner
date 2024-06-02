@@ -19,6 +19,11 @@ namespace TourPlannerBusinessLayer.Managers
     public class ReportManager
     {
         private static readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
+
+        public ReportManager()
+        {
+            // Parameterless constructor
+        }
         public void GenerateReport(Tour tour, string destinationPath, TourService tourService)
         {
             try
@@ -252,7 +257,7 @@ namespace TourPlannerBusinessLayer.Managers
             }
             catch (Exception ex)
             {
-                logger.Error($"Error generating summary report {ex.Message}");
+                
             }
         }
 

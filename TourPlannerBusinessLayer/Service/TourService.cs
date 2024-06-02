@@ -9,12 +9,16 @@ namespace TourPlannerBusinessLayer.Service
     {
         private readonly IServiceProvider _serviceProvider;
 
+        public TourService()
+        {
+        }
+
         public TourService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public async Task AddTourAsync(Tour tour)
+        public virtual async Task AddTourAsync(Tour tour)
         {
             try
             {
@@ -32,7 +36,7 @@ namespace TourPlannerBusinessLayer.Service
             }
         }
 
-        public async Task<List<Tour>> GetToursAsync()
+        public virtual async Task<List<Tour>> GetToursAsync()
         {
             try
             {
@@ -48,7 +52,7 @@ namespace TourPlannerBusinessLayer.Service
             }
         }
 
-        public async Task AddTourLogAsync(TourLog tourLog)
+        public virtual async Task AddTourLogAsync(TourLog tourLog)
         {
             try
             {
@@ -64,7 +68,7 @@ namespace TourPlannerBusinessLayer.Service
             }
         }
 
-        public async Task<List<TourLog>> GetTourLogsAsync()
+        public virtual async Task<List<TourLog>> GetTourLogsAsync()
         {
             try
             {
@@ -80,7 +84,7 @@ namespace TourPlannerBusinessLayer.Service
             }
         }
 
-        public async Task DeleteTourAsync(Tour tour)
+        public virtual async Task DeleteTourAsync(Tour tour)
         {
             try
             {
@@ -96,7 +100,7 @@ namespace TourPlannerBusinessLayer.Service
             }
         }
 
-        public async Task UpdateTourAsync(Tour tour)
+        public virtual async Task UpdateTourAsync(Tour tour)
         {
             try
             {

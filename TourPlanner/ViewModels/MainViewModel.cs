@@ -235,6 +235,10 @@ namespace TourPlanner.ViewModels
                     _reportManager.GenerateReport(TourViewModel.SelectedTour, fileName, _tourService);
                 }
             }
+            else
+            {
+                MessageBox.Show("Please select a tour to generate a report.", "No tour selected", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private void GenerateReportWithMapScreenshot(object parameter)
@@ -246,6 +250,10 @@ namespace TourPlanner.ViewModels
                 {
                     _reportManager.GenerateReportWithMapScreenshot(TourViewModel.SelectedTour, fileName, _tourService, _webView);
                 }
+            }
+            else
+            {
+                MessageBox.Show("Please select a tour to generate a report.", "No tour selected", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
