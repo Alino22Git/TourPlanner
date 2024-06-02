@@ -3,13 +3,13 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+using TourPlannerLogging;
 namespace TourPlannerBusinessLayer.Service
 {
     public class DirectionService
     {
         private readonly HttpClient _httpClient;
-
+        private static readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
         public DirectionService(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -58,6 +58,7 @@ namespace TourPlannerBusinessLayer.Service
             }
             catch (Exception ex)
             {
+                logger.Error($"Error fetching directions data: {ex.Message}");
                 Debug.WriteLine($"Error fetching directions data: {ex.Message}");
                 return null;
             }
@@ -127,6 +128,7 @@ namespace TourPlannerBusinessLayer.Service
             }
             catch (Exception ex)
             {
+                logger.Error($"Error fetching directions data: {ex.Message}");
                 Debug.WriteLine($"Error fetching directions data: {ex.Message}");
                 return (null, null);
             }
