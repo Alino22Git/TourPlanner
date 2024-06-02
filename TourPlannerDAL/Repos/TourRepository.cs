@@ -26,7 +26,8 @@ namespace TourPlannerDAL
             }
             catch (Exception e)
             {
-               logger.Error($"Error adding tour {e.Message}");
+                logger.Error($"Error adding tour {e.Message}");
+                throw new Exception("Error retrieving tours", e);
             }
         }
 
@@ -67,7 +68,7 @@ namespace TourPlannerDAL
             catch (Exception e)
             {
                 logger.Error($"Error adding tour {e.Message}");
-                return new List<Tour>();
+                throw new Exception("Error retrieving tours", e);
             }
         }
     }

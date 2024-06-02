@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using TourPlannerBusinessLayer.Exceptions;
 
 namespace TourPlannerBusinessLayer.Service
 {
@@ -11,27 +15,29 @@ namespace TourPlannerBusinessLayer.Service
             _httpClient = httpClient;
         }
 
-        public async Task<(double, double)> GetCoordinatesAsync(string address, string apiKey){
-            if (address != null){
-                string url = $"https://api.openrouteservice.org/geocode/search?api_key={apiKey}&text={Uri.EscapeDataString(address)}";
-
-                try{
-                    HttpResponseMessage response = await _httpClient.GetAsync(url);
-                    response.EnsureSuccessStatusCode();
-                    string result = await response.Content.ReadAsStringAsync();
-                    var json = JObject.Parse(result);
-                    var coordinates = json["features"][0]["geometry"]["coordinates"];
-                    double longitude = coordinates[0].Value<double>();
-                    double latitude = coordinates[1].Value<double>();
-                    return (longitude, latitude);
-                }
-                catch (Exception ex){
-                    Console.WriteLine($"Error fetching geocode data: {ex.Message}");
-                    return (0, 0);
-                }
+        public async Task<(double, double)> GetCoordinatesAsync(string address, string apiKey)
+        {
+            if (address == null)
+            {
+                throw new GeocodeServiceException("Address cannot be null");
             }
-            else{
-                return (0, 0);
+
+            string url = $"https://api.openrouteservice.org/geocode/search?api_key={apiKey}&text={Uri.EscapeDataString(address)}";
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                string result = await response.Content.ReadAsStringAsync();
+                var json = JObject.Parse(result);
+                var coordinates = json["features"][0]["geometry"]["coordinates"];
+                double longitude = coordinates[0].Value<double>();
+                double latitude = coordinates[1].Value<double>();
+                return (longitude, latitude);
+            }
+            catch (Exception ex)
+            {
+                throw new GeocodeServiceException("Error fetching geocode data", ex);
             }
         }
     }
