@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Models;
+using TourPlannerBusinessLayer.Exceptions;
 using TourPlannerDAL;
 
 namespace TourPlannerBusinessLayer.Service
@@ -8,70 +9,122 @@ namespace TourPlannerBusinessLayer.Service
     {
         private readonly IServiceProvider _serviceProvider;
 
+        public TourService()
+        {
+        }
+
         public TourService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public async Task AddTourAsync(Tour tour){
-            ValidateTour(tour);
-
-            using (var scope = _serviceProvider.CreateScope())
+        public virtual async Task AddTourAsync(Tour tour)
+        {
+            try
             {
-                var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
-                await tourRepository.AddTourAsync(tour);
+                ValidateTour(tour);
+
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
+                    await tourRepository.AddTourAsync(tour);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TourServiceException("Error adding tour", ex);
             }
         }
 
-        public async Task<List<Tour>> GetToursAsync(){
-            using (var scope = _serviceProvider.CreateScope())
+        public virtual async Task<List<Tour>> GetToursAsync()
+        {
+            try
             {
-                var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
-                return await tourRepository.GetToursAsync();
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
+                    return await tourRepository.GetToursAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TourServiceException("Error retrieving tours", ex);
             }
         }
 
-        public async Task AddTourLogAsync(TourLog tourLog){
-            using (var scope = _serviceProvider.CreateScope())
+        public virtual async Task AddTourLogAsync(TourLog tourLog)
+        {
+            try
             {
-                var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
-                await tourLogRepository.AddTourLogAsync(tourLog);
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
+                    await tourLogRepository.AddTourLogAsync(tourLog);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TourServiceException("Error adding tour log", ex);
             }
         }
 
-        public async Task<List<TourLog>> GetTourLogsAsync(){
-            using (var scope = _serviceProvider.CreateScope())
+        public virtual async Task<List<TourLog>> GetTourLogsAsync()
+        {
+            try
             {
-                var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
-                return await tourLogRepository.GetTourLogsAsync();
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
+                    return await tourLogRepository.GetTourLogsAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TourServiceException("Error retrieving tour logs", ex);
             }
         }
 
-        public async Task DeleteTourAsync(Tour tour){
-            using (var scope = _serviceProvider.CreateScope())
+        public virtual async Task DeleteTourAsync(Tour tour)
+        {
+            try
             {
-                var tourLogRepository = scope.ServiceProvider.GetRequiredService<TourLogRepository>();
-                var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
-                await tourRepository.DeleteTourAsync(tour);
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
+                    await tourRepository.DeleteTourAsync(tour);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TourServiceException("Error deleting tour", ex);
             }
         }
 
-        public async Task UpdateTourAsync(Tour tour){
-            ValidateTour(tour);
-
-            using (var scope = _serviceProvider.CreateScope())
+        public virtual async Task UpdateTourAsync(Tour tour)
+        {
+            try
             {
-                var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
-                await tourRepository.UpdateTourAsync(tour);
+                ValidateTour(tour);
+
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var tourRepository = scope.ServiceProvider.GetRequiredService<TourRepository>();
+                    await tourRepository.UpdateTourAsync(tour);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TourServiceException("Error updating tour", ex);
             }
         }
 
-        private void ValidateTour(Tour tour){
+        private void ValidateTour(Tour tour)
+        {
             if (string.IsNullOrEmpty(tour.Name))
-                throw new ArgumentException("Tour Name cannot be empty");
+                throw new ValidationException("Tour Name cannot be empty");
 
             if (string.IsNullOrEmpty(tour.TransportType))
-                throw new ArgumentException("Transport Type cannot be empty");
+                throw new ValidationException("Transport Type cannot be empty");
         }
     }
 }

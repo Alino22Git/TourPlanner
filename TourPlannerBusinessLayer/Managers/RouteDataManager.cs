@@ -11,6 +11,11 @@ namespace TourPlannerBusinessLayer.Managers
         private readonly DirectionService _directionService;
         private readonly string _apiKey;
         private static readonly ILoggerWrapper logger = LoggerFactory.GetLogger();
+
+        public RouteDataManager()
+        {
+
+        }
         public RouteDataManager(GeocodeService geocodeService, DirectionService directionService, IConfiguration configuration)
         {
             _geocodeService = geocodeService;
@@ -18,7 +23,7 @@ namespace TourPlannerBusinessLayer.Managers
             _apiKey = configuration["ApiKeys:OpenRouteService"];
         }
 
-        public async Task<(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string directions)> GetTourDataAsync(string from, string to, string transportType)
+        public virtual async Task<(double startLongitude, double startLatitude, double endLongitude, double endLatitude, string directions)> GetTourDataAsync(string from, string to, string transportType)
         {
             try {
                 var (startLongitude, startLatitude) = await _geocodeService.GetCoordinatesAsync(from, _apiKey);
@@ -62,7 +67,7 @@ namespace TourPlannerBusinessLayer.Managers
             }
         }
 
-        public async Task<(string Distance, string Duration)> GetDistanceAndDurationAsync(string from, string to, string transportType)
+        public virtual async Task<(string Distance, string Duration)> GetDistanceAndDurationAsync(string from, string to, string transportType)
         {
             try
             {

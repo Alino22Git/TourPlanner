@@ -10,6 +10,8 @@ using Models;
 using TourPlanner.Views;
 using TourPlannerBusinessLayer.Managers;
 using TourPlannerBusinessLayer.Service;
+using TourPlannerBusinessLayer.Exceptions;
+using TourPlannerLogging;
 
 namespace TourPlanner.ViewModels
 {
@@ -17,7 +19,7 @@ namespace TourPlanner.ViewModels
     {
         private readonly TourService _tourService;
         private readonly RouteDataManager _routeDataManager;
-
+        private static readonly ILoggerWrapper _logger = LoggerFactory.GetLogger();
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public ICommand SaveTourCommand { get; }
@@ -57,7 +59,7 @@ namespace TourPlanner.ViewModels
             "Car"
         };
 
-        private Tour? OriginalTour { get; set; }
+        public Tour? OriginalTour { get; set; }
 
         public TourViewModel(TourService tourService, RouteDataManager routeDataManager)
         {
@@ -68,11 +70,27 @@ namespace TourPlanner.ViewModels
             DeleteTourCommand = new RelayCommand(async (parameter) => await DeleteSelectedTour(parameter));
         }
 
-        public async void LoadTours()
+        public async Task LoadTours()
         {
-            var toursFromDb = await _tourService.GetToursAsync();
-            Tours = new ObservableCollection<Tour>(toursFromDb);
+            try
+            {
+                var toursFromDb = await _tourService.GetToursAsync();
+                Tours = new ObservableCollection<Tour>(toursFromDb);
+            }
+            catch (TourServiceException ex)
+            {
+                MessageBox.Show($"Error loading tours: {ex.Message}");
+                _logger.LogError($"Error loading tours: {ex.Message}");
+                Debug.WriteLine($"Error loading tours: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}");
+                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                Debug.WriteLine($"An unexpected error occurred: {ex.Message}");
+            }
         }
+
 
         public async void StartEditing(Tour originalTour)
         {
@@ -91,7 +109,7 @@ namespace TourPlanner.ViewModels
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Error getting distance and time for tour {originalTour.Name}: {ex.Message}");
-                    distance = null; 
+                    distance = null;
                     time = null;
                 }
             }
@@ -142,33 +160,11 @@ namespace TourPlanner.ViewModels
                                 SelectedTour.Time = null; // Set to null if time couldn't be fetched
                             }
                         }
-                        await _tourService.AddTourAsync(SelectedTour);
-                        Tours.Add(SelectedTour);
+                        await AddTour(SelectedTour);
                     }
                     else
                     {
-                        OriginalTour.Name = SelectedTour.Name;
-                        OriginalTour.From = SelectedTour.From;
-                        OriginalTour.To = SelectedTour.To;
-                        OriginalTour.Time = SelectedTour.Time;
-                        OriginalTour.Description = SelectedTour.Description;
-                        OriginalTour.TransportType = SelectedTour.TransportType;
-                        if (!string.IsNullOrEmpty(OriginalTour.From) && !string.IsNullOrEmpty(OriginalTour.To))
-                        {
-                            try
-                            {
-                                var (distance, time) = await _routeDataManager.GetDistanceAndDurationAsync(OriginalTour.From, OriginalTour.To, OriginalTour.TransportType);
-                                OriginalTour.Distance = distance;
-                                OriginalTour.Time = time;
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine($"Error getting distance and time for existing tour: {ex.Message}");
-                                OriginalTour.Distance = null;
-                                OriginalTour.Time = null;
-                            }
-                        }
-                        await _tourService.UpdateTourAsync(OriginalTour);
+                        await UpdateTour();
                     }
 
                     LoadTours();
@@ -188,6 +184,47 @@ namespace TourPlanner.ViewModels
             {
                 MessageBox.Show("No tour selected to save.");
             }
+        }
+
+        private async Task AddTour(Tour tour)
+        {
+            try
+            {
+                await _tourService.AddTourAsync(tour);
+                Tours.Add(tour);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error adding tour: {ex.Message}");
+                throw new Exception($"Error adding tour: {ex.Message}", ex);
+            }
+        }
+
+        private async Task UpdateTour()
+        {
+            OriginalTour.Name = SelectedTour.Name;
+            OriginalTour.From = SelectedTour.From;
+            OriginalTour.To = SelectedTour.To;
+            OriginalTour.Time = SelectedTour.Time;
+            OriginalTour.Description = SelectedTour.Description;
+            OriginalTour.TransportType = SelectedTour.TransportType;
+
+            if (!string.IsNullOrEmpty(OriginalTour.From) && !string.IsNullOrEmpty(OriginalTour.To))
+            {
+                try
+                {
+                    var (distance, time) = await _routeDataManager.GetDistanceAndDurationAsync(OriginalTour.From, OriginalTour.To, OriginalTour.TransportType);
+                    OriginalTour.Distance = distance;
+                    OriginalTour.Time = time;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error getting distance and time for existing tour: {ex.Message}");
+                    OriginalTour.Distance = null;
+                    OriginalTour.Time = null;
+                }
+            }
+            await _tourService.UpdateTourAsync(OriginalTour);
         }
 
         private async Task DeleteSelectedTour(object? parameter)
