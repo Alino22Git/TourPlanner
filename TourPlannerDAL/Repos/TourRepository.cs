@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using TourPlannerLogging;
+using TourPlannerDAL.Exceptions;
 
 namespace TourPlannerDAL
 {
@@ -26,8 +28,9 @@ namespace TourPlannerDAL
             }
             catch (Exception e)
             {
-                logger.Error($"Error adding tour {e.Message}");
-                throw new Exception("Error retrieving tours", e);
+                string errorMsg = $"Error adding tour: {e.Message}";
+                logger.Error(errorMsg);
+                throw new TourRepositoryException(errorMsg, e);
             }
         }
 
@@ -40,7 +43,9 @@ namespace TourPlannerDAL
             }
             catch (Exception e)
             {
-                logger.Error($"Error adding tour {e.Message}");
+                string errorMsg = $"Error updating tour: {e.Message}";
+                logger.Error(errorMsg);
+                throw new TourRepositoryException(errorMsg, e);
             }
         }
 
@@ -55,7 +60,9 @@ namespace TourPlannerDAL
             }
             catch (Exception e)
             {
-                logger.Error($"Error adding tour {e.Message}");
+                string errorMsg = $"Error deleting tour: {e.Message}";
+                logger.Error(errorMsg);
+                throw new TourRepositoryException(errorMsg, e);
             }
         }
 
@@ -67,8 +74,9 @@ namespace TourPlannerDAL
             }
             catch (Exception e)
             {
-                logger.Error($"Error adding tour {e.Message}");
-                throw new Exception("Error retrieving tours", e);
+                string errorMsg = $"Error retrieving tours: {e.Message}";
+                logger.Error(errorMsg);
+                throw new TourRepositoryException(errorMsg, e);
             }
         }
     }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
+using TourPlannerBusinessLayer.Exceptions;
 using TourPlannerBusinessLayer.Managers;
 using TourPlannerBusinessLayer.Service;
 using TourPlannerLogging;
@@ -56,7 +57,7 @@ namespace TourPlannerTest
         }
 
         [Test]
-        public async Task GetTourDataAsync_ShouldHandleException()
+        public void GetTourDataAsync_ShouldThrowRouteDataManagerException()
         {
             // Arrange
             string from = "InvalidPlace";
@@ -66,16 +67,13 @@ namespace TourPlannerTest
             _mockGeocodeService.Setup(service => service.GetCoordinatesAsync(from, "test-api-key"))
                 .ThrowsAsync(new Exception("Geocode error"));
 
-            // Act
-            var result = await _routeDataManager.GetTourDataAsync(from, to, transportType);
-
-            // Assert
-            Assert.AreEqual(0, result.startLongitude);
-            Assert.AreEqual(0, result.startLatitude);
-            Assert.AreEqual(0, result.endLongitude);
-            Assert.AreEqual(0, result.endLatitude);
-            Assert.AreEqual("", result.directions);
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<RouteDataManagerException>(async () =>
+                await _routeDataManager.GetTourDataAsync(from, to, transportType));
+            Assert.That(ex.Message, Is.EqualTo("Unexpected error retrieving tour data: Geocode error"));
+            Assert.That(ex.InnerException.Message, Is.EqualTo("Geocode error"));
         }
+
 
         [Test]
         public async Task SaveDirectionsToFileAsync_ShouldSaveToFile()
@@ -133,7 +131,7 @@ namespace TourPlannerTest
         }
 
         [Test]
-        public async Task GetDistanceAndDurationAsync_ShouldHandleException()
+        public void GetDistanceAndDurationAsync_ShouldThrowRouteDataManagerException()
         {
             // Arrange
             string from = "InvalidPlace";
@@ -143,12 +141,12 @@ namespace TourPlannerTest
             _mockGeocodeService.Setup(service => service.GetCoordinatesAsync(from, "test-api-key"))
                 .ThrowsAsync(new Exception("Geocode error"));
 
-            // Act
-            var result = await _routeDataManager.GetDistanceAndDurationAsync(from, to, transportType);
-
-            // Assert
-            Assert.AreEqual("", result.Distance);
-            Assert.AreEqual("", result.Duration);
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<RouteDataManagerException>(async () =>
+                await _routeDataManager.GetDistanceAndDurationAsync(from, to, transportType));
+            Assert.That(ex.Message, Is.EqualTo("Unexpected error retrieving distance and duration: Geocode error"));
+            Assert.That(ex.InnerException.Message, Is.EqualTo("Geocode error"));
         }
+
     }
 }

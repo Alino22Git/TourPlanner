@@ -41,4 +41,22 @@ namespace TourPlanner.Exceptions
 
       public SaveException(string message, Exception innerException) : base(message, innerException) { }
     }
+
+    public class DeleteException : UiLayerException
+    {
+        public DeleteException() { }
+
+        public DeleteException(string message) : base(message) { }
+
+        public DeleteException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    public class LoadException : UiLayerException
+    {
+        public LoadException() { }
+
+        public LoadException(string message) : base(message) { }
+
+        public LoadException(string message, Exception innerException) : base(message, innerException) { }
+    }
 }

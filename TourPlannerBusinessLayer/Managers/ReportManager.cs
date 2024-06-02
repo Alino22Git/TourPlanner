@@ -8,12 +8,16 @@ using iText.Layout.Properties;
 using Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using TourPlannerBusinessLayer.Exceptions;
 using TourPlannerBusinessLayer.Service;
+using TourPlannerLogging;
 using Microsoft.Web.WebView2.Wpf;
 using Microsoft.Web.WebView2.Core;
 using iText.IO.Image;
-using TourPlannerLogging;
+
 namespace TourPlannerBusinessLayer.Managers
 {
     public class ReportManager
@@ -22,8 +26,8 @@ namespace TourPlannerBusinessLayer.Managers
 
         public ReportManager()
         {
-            // Parameterless constructor
         }
+
         public void GenerateReport(Tour tour, string destinationPath, TourService tourService)
         {
             try
@@ -32,7 +36,6 @@ namespace TourPlannerBusinessLayer.Managers
                 PdfDocument pdf = new PdfDocument(writer);
                 Document document = new Document(pdf);
 
-                // Tour Information
                 Paragraph tourHeader = new Paragraph($"Tour: {tour.Name}")
                         .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA))
                         .SetFontSize(18)
@@ -48,10 +51,8 @@ namespace TourPlannerBusinessLayer.Managers
                 document.Add(new Paragraph($"Popularity: {tour.Popularity}"));
                 document.Add(new Paragraph($"Child Friendliness: {tour.ChildFriendliness}"));
 
-                // Adding a line break
                 document.Add(new Paragraph("\n"));
 
-                // Tour Logs Information
                 Paragraph tourLogsHeader = new Paragraph("Tour Logs")
                         .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA))
                         .SetFontSize(16)
@@ -81,26 +82,24 @@ namespace TourPlannerBusinessLayer.Managers
             }
             catch (Exception ex)
             {
-                logger.Error($"Error generating report {ex.Message}");
+                string errorMsg = $"Error generating report: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new ReportManagerException(errorMsg, ex);
             }
         }
-
 
         public async Task GenerateReportWithMapScreenshot(Tour tour, string destinationPath, TourService tourService, WebView2 webView)
         {
             try
             {
-                // Define the screenshot file path
                 string screenshotFilePath = "C:\\Users\\micha\\Desktop\\map_screenshot.png";
 
-                // Capture the screenshot
                 await CaptureScreenshotAsync(webView, screenshotFilePath);
 
                 PdfWriter writer = new PdfWriter(destinationPath);
                 PdfDocument pdf = new PdfDocument(writer);
                 Document document = new Document(pdf);
 
-                // Tour Information
                 Paragraph tourHeader = new Paragraph($"Tour: {tour.Name}")
                         .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA))
                         .SetFontSize(18)
@@ -116,14 +115,11 @@ namespace TourPlannerBusinessLayer.Managers
                 document.Add(new Paragraph($"Popularity: {tour.Popularity}"));
                 document.Add(new Paragraph($"Child Friendliness: {tour.ChildFriendliness}"));
 
-                // Adding a line break
                 document.Add(new Paragraph("\n"));
 
-                // Add the map screenshot
                 Image mapImage = new Image(ImageDataFactory.Create(screenshotFilePath));
                 document.Add(mapImage);
 
-                // Tour Logs Information
                 Paragraph tourLogsHeader = new Paragraph("Tour Logs")
                         .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA))
                         .SetFontSize(16)
@@ -153,7 +149,9 @@ namespace TourPlannerBusinessLayer.Managers
             }
             catch (Exception ex)
             {
-                logger.Error($"Error generating report {ex.Message}");
+                string errorMsg = $"Error generating report with map screenshot: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new ReportManagerException(errorMsg, ex);
             }
         }
 
@@ -168,10 +166,11 @@ namespace TourPlannerBusinessLayer.Managers
             }
             catch (Exception ex)
             {
-                logger.Error($"Error capturing screenshot {ex.Message}");
+                string errorMsg = $"Error capturing screenshot: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new ReportManagerException(errorMsg, ex);
             }
         }
-
 
         public async void GenerateSummaryReport(string destinationPath, TourService tourService)
         {
@@ -181,7 +180,6 @@ namespace TourPlannerBusinessLayer.Managers
                 PdfDocument pdf = new PdfDocument(writer);
                 Document document = new Document(pdf);
 
-                // Set document properties
                 document.Add(new Paragraph("Tour Summary Report")
                     .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA))
                     .SetFontSize(24)
@@ -205,7 +203,6 @@ namespace TourPlannerBusinessLayer.Managers
                     double averageDistance = tour.TourLogs.Count > 0 ? totalDistance / tour.TourLogs.Count : 0;
                     double averageTime = tour.TourLogs.Count > 0 ? totalTime / tour.TourLogs.Count : 0;
 
-                    // Tour header
                     document.Add(new Paragraph($"Tour: {tour.Name}")
                         .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA))
                         .SetFontSize(18)
@@ -214,11 +211,9 @@ namespace TourPlannerBusinessLayer.Managers
                         .SetMarginTop(10)
                         .SetMarginBottom(10));
 
-                    // Create a table for tour details
                     Table table = new Table(UnitValue.CreatePercentArray(new float[] { 1, 2 }))
                         .UseAllAvailableWidth();
 
-                    // Add table header
                     table.AddHeaderCell(new Cell().Add(new Paragraph("Metric")
                         .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA))
                         .SetFontSize(12)
@@ -233,7 +228,6 @@ namespace TourPlannerBusinessLayer.Managers
                         .SetFontColor(ColorConstants.WHITE))
                         .SetBackgroundColor(ColorConstants.GRAY));
 
-                    // Add data to the table
                     table.AddCell(new Cell().Add(new Paragraph("Average Distance")
                         .SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA))
                         .SetFontSize(12)));
@@ -252,15 +246,15 @@ namespace TourPlannerBusinessLayer.Managers
 
                     document.Add(table);
                 }
-
                 document.Close();
             }
             catch (Exception ex)
             {
-                
+                string errorMsg = $"Error generating summary report: {ex.Message}";
+                logger.Error(errorMsg);
+                throw new ReportManagerException(errorMsg, ex);
             }
         }
-
 
         private Cell GetHeaderCell(string headerText)
         {

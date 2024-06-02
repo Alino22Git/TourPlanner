@@ -22,7 +22,6 @@ namespace Models
             }
         }
 
-        // Navigation property for the related Tour
         public Tour Tour { get; set; }
 
         private int id;

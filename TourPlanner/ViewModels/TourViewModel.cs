@@ -12,6 +12,7 @@ using TourPlannerBusinessLayer.Managers;
 using TourPlannerBusinessLayer.Service;
 using TourPlannerBusinessLayer.Exceptions;
 using TourPlannerLogging;
+using TourPlanner.Exceptions;
 
 namespace TourPlanner.ViewModels
 {
@@ -61,6 +62,8 @@ namespace TourPlanner.ViewModels
 
         public Tour? OriginalTour { get; set; }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public TourViewModel(TourService tourService, RouteDataManager routeDataManager)
         {
             _tourService = tourService ?? throw new ArgumentNullException(nameof(tourService));
@@ -70,6 +73,8 @@ namespace TourPlanner.ViewModels
             DeleteTourCommand = new RelayCommand(async (parameter) => await DeleteSelectedTour(parameter));
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public async Task LoadTours()
         {
             try
@@ -80,18 +85,19 @@ namespace TourPlanner.ViewModels
             catch (TourServiceException ex)
             {
                 MessageBox.Show($"Error loading tours: {ex.Message}");
-                _logger.LogError($"Error loading tours: {ex.Message}");
+                _logger.Error($"Error loading tours: {ex.Message}");
                 Debug.WriteLine($"Error loading tours: {ex.Message}");
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"An unexpected error occurred: {ex.Message}");
-                _logger.LogError($"An unexpected error occurred: {ex.Message}");
+                _logger.Error($"An unexpected error occurred: {ex.Message}");
                 Debug.WriteLine($"An unexpected error occurred: {ex.Message}");
             }
         }
 
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public async void StartEditing(Tour originalTour)
         {
             if (originalTour == null) return;
@@ -108,6 +114,7 @@ namespace TourPlanner.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    _logger.Error($"Error getting distance and time for tour {originalTour.Name}: {ex.Message}");
                     Debug.WriteLine($"Error getting distance and time for tour {originalTour.Name}: {ex.Message}");
                     distance = null;
                     time = null;
@@ -129,14 +136,26 @@ namespace TourPlanner.ViewModels
             OnPropertyChanged(nameof(SelectedTour));
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public void CreateNewTour(object? parameter)
         {
-            OriginalTour = null;
-            SelectedTour = new Tour();
-            var addTourWindow = new AddTourWindow(this, SelectedTour);
-            addTourWindow.ShowDialog();
+            try
+            {
+                OriginalTour = null;
+                SelectedTour = new Tour();
+                var addTourWindow = new AddTourWindow(this, SelectedTour);
+                addTourWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error creating new tour: {ex.Message}");
+                throw new InitializationException("Error creating new tour", ex);
+            }
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private async Task SaveTour(object? parameter)
         {
             if (SelectedTour != null)
@@ -155,6 +174,7 @@ namespace TourPlanner.ViewModels
                             }
                             catch (Exception ex)
                             {
+                                _logger.Error($"Error getting distance and time for new tour: {ex.Message}");
                                 Debug.WriteLine($"Error getting distance and time for new tour: {ex.Message}");
                                 SelectedTour.Distance = null; // Set to null if distance couldn't be fetched
                                 SelectedTour.Time = null; // Set to null if time couldn't be fetched
@@ -177,6 +197,7 @@ namespace TourPlanner.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    _logger.Error($"Error saving tour: {ex.Message}");
                     MessageBox.Show($"Error saving tour: {ex.Message}");
                 }
             }
@@ -186,6 +207,8 @@ namespace TourPlanner.ViewModels
             }
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private async Task AddTour(Tour tour)
         {
             try
@@ -195,59 +218,84 @@ namespace TourPlanner.ViewModels
             }
             catch (Exception ex)
             {
+                _logger.Error($"Error adding tour: {ex.Message}");
                 MessageBox.Show($"Error adding tour: {ex.Message}");
-                throw new Exception($"Error adding tour: {ex.Message}", ex);
+                throw new SaveException("Error adding tour", ex);
             }
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private async Task UpdateTour()
         {
-            OriginalTour.Name = SelectedTour.Name;
-            OriginalTour.From = SelectedTour.From;
-            OriginalTour.To = SelectedTour.To;
-            OriginalTour.Time = SelectedTour.Time;
-            OriginalTour.Description = SelectedTour.Description;
-            OriginalTour.TransportType = SelectedTour.TransportType;
-
-            if (!string.IsNullOrEmpty(OriginalTour.From) && !string.IsNullOrEmpty(OriginalTour.To))
+            try
             {
-                try
+                OriginalTour.Name = SelectedTour.Name;
+                OriginalTour.From = SelectedTour.From;
+                OriginalTour.To = SelectedTour.To;
+                OriginalTour.Time = SelectedTour.Time;
+                OriginalTour.Description = SelectedTour.Description;
+                OriginalTour.TransportType = SelectedTour.TransportType;
+
+                if (!string.IsNullOrEmpty(OriginalTour.From) && !string.IsNullOrEmpty(OriginalTour.To))
                 {
-                    var (distance, time) = await _routeDataManager.GetDistanceAndDurationAsync(OriginalTour.From, OriginalTour.To, OriginalTour.TransportType);
-                    OriginalTour.Distance = distance;
-                    OriginalTour.Time = time;
+                    try
+                    {
+                        var (distance, time) = await _routeDataManager.GetDistanceAndDurationAsync(OriginalTour.From, OriginalTour.To, OriginalTour.TransportType);
+                        OriginalTour.Distance = distance;
+                        OriginalTour.Time = time;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error($"Error getting distance and time for existing tour: {ex.Message}");
+                        Debug.WriteLine($"Error getting distance and time for existing tour: {ex.Message}");
+                        OriginalTour.Distance = null;
+                        OriginalTour.Time = null;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error getting distance and time for existing tour: {ex.Message}");
-                    OriginalTour.Distance = null;
-                    OriginalTour.Time = null;
-                }
+                await _tourService.UpdateTourAsync(OriginalTour);
             }
-            await _tourService.UpdateTourAsync(OriginalTour);
+            catch (Exception ex)
+            {
+                _logger.Error($"Error updating tour: {ex.Message}");
+                throw new SaveException("Error updating tour", ex);
+            }
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private async Task DeleteSelectedTour(object? parameter)
         {
-            if (SelectedTour != null && Tours != null)
+            try
             {
-                var tourToDelete = Tours.FirstOrDefault(t => t.Id == SelectedTour.Id);
-                if (tourToDelete != null)
+                if (SelectedTour != null && Tours != null)
                 {
-                    Tours.Remove(tourToDelete);
-                    await _tourService.DeleteTourAsync(tourToDelete);
+                    var tourToDelete = Tours.FirstOrDefault(t => t.Id == SelectedTour.Id);
+                    if (tourToDelete != null)
+                    {
+                        Tours.Remove(tourToDelete);
+                        await _tourService.DeleteTourAsync(tourToDelete);
+                    }
+                    SelectedTour = null;
+                    OnPropertyChanged(nameof(Tours));
+                    OnPropertyChanged(nameof(SelectedTour));
+                    if (parameter is Window window)
+                    {
+                        window.DialogResult = true;
+                        window.Close();
+                    }
                 }
-                SelectedTour = null;
-                OnPropertyChanged(nameof(Tours));
-                OnPropertyChanged(nameof(SelectedTour));
-                if (parameter is Window window)
-                {
-                    window.DialogResult = true;
-                    window.Close();
-                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error deleting tour: {ex.Message}");
+                MessageBox.Show($"Error deleting tour: {ex.Message}");
+                throw new DeleteException("Error deleting tour", ex);
             }
         }
 
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
